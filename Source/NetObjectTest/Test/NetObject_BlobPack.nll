@@ -1,0 +1,68 @@
+namespace NumbatLogic
+{
+	/*<?
+		include_once "../../Metaprogramming.php";
+
+		$pObjectArray[] = new NetObject("TestObject",
+			[
+				new NetObjectField("Uint32", "TestId", false),
+				new NetObjectField("string", "Name", false),
+			]
+		);
+		NetObject_Header($pObjectArray);
+	?>*/
+		class TestObject : NetObject
+		{
+			public Uint32 __nTestId;
+			public InternalString* __sName;
+
+			public construct()
+			{
+				__sName = own new InternalString("");
+			}
+
+			public Uint32 GetTestId() { return __nTestId; }
+			public string GetName() { return __sName.GetExternalString(); }
+
+			public void Pack(gsBlob pBlob)
+			{
+				pBlob.PackUint32(__nTestId);
+				pBlob.PackInternalString(__sName);
+			}
+			public bool Unpack(gsBlob pBlob)
+			{
+				return pBlob.UnpackUint32(__nTestId) &&
+						pBlob.UnpackInternalString(__sName);
+			}
+
+			public bool IsEqual(TestObject pOther)
+			{
+				return __nTestId == pOther.__nTestId &&
+						__sName.IsEqual(pOther.__sName.GetExternalString());
+			}
+		}
+
+	/*<??>*/
+
+	class NetObject_BlobPack
+	{
+		public static void Run()
+		{
+			TestObject* pObjectA = own new TestObject();
+			pObjectA.__nTestId = 1234;
+			pObjectA.__sName.Set("banana");
+			gsBlob* pBlob = own new gsBlob();
+			pObjectA.Pack(pBlob);
+			
+			pBlob.SetOffset(0);
+
+			TestObject* pObjectB = own new TestObject();
+			Assert::Plz(pObjectB.Unpack(pBlob));
+			Assert::Plz(pObjectB.IsEqual(pObjectA));
+
+			TestObject* pObjectC = own new TestObject();
+			Assert::Plz(!pObjectC.Unpack(pBlob));
+			Assert::Plz(!pObjectC.IsEqual(pObjectA));
+		}
+	}
+} 
