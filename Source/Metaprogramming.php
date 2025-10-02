@@ -124,17 +124,31 @@ MinimalMemberChangeset::Pack(pMemberChangeset);
 
 			Output("\tclass " . $this->m_sName . "Info : NetObject::Info\n");
 			Output("\t{\n");
-			Output("\t\tpublic construct()\n");
-			Output("\t\t{\n");
-			for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
-			{
-				$pField = $this->m_pFieldArray[$j];
+				Output("\t\tpublic static " . $this->m_sName . "Info __pStatic = null;\n");
+				Output("\t\tpublic construct()\n");
+				Output("\t\t{\n");
+				Output("\t\t\tAssert::Plz(__pStatic == null);\n");
+				Output("\t\t\t__pStatic = this;\n");
+				for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
+				{
+					$pField = $this->m_pFieldArray[$j];
 
-			//	Output("\t\t\t__pFieldInfoVector.PushBack(new NetObject::FieldInfo(TYPE, \"" . $pField->GetMemberName() . "\"));\n");
-			}
-			Output("\t\t}\n");
+				//	Output("\t\t\t__pFieldInfoVector.PushBack(new NetObject::FieldInfo(TYPE, \"" . $pField->GetMemberName() . "\"));\n");
+				}
+				Output("\t\t}\n");
+				Output("\t\tpublic destruct() { __pStatic = null; }\n");
+
+				Output("\t\tpublic static " . $this->m_sName . "Info GetStatic()\n");
+				Output("\t\t{\n");
+					Output("\t\t\tAssert::Plz(__pStatic != null);\n");
+					Output("\t\t\treturn __pStatic;\n");
+				Output("\t\t}\n");
 			Output("\t}\n");
 			Output("\n");
+
+
+
+
 
 			Output("\tclass " . $this->m_sName . " : NetObject::Object\n");
 			Output("\t{\n");
@@ -150,7 +164,7 @@ MinimalMemberChangeset::Pack(pMemberChangeset);
 			}
 			Output("\n");
 
-			Output("\t\tpublic construct()\n");
+			Output("\t\tpublic construct(NetObject::Filter pFilter = null) : base(" . $this->m_sName . "Info::GetStatic(), pFilter)\n");
 			Output("\t\t{\n");
 			for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
 			{
@@ -243,8 +257,17 @@ MinimalMemberChangeset::Pack(pMemberChangeset);
 
 		public function Output()
 		{
-			Output("\tclass " . $this->m_sName . "Info : NetObject::Filter\n");
+			Output("\tclass " . $this->m_sName . " : NetObject::Filter\n");
 			Output("\t{\n");
+
+				Output("\t\tpublic static " . $this->m_sName . " __pStatic = null;\n");
+				Output("\t\tpublic construct()\n");
+				Output("\t\t{\n");
+				Output("\t\t\tAssert::Plz(__pStatic == null);\n");
+				Output("\t\t\t__pStatic = this;\n");
+				
+				Output("\t\t}\n");
+				Output("\t\tpublic destruct() { __pStatic = null; }\n");
 			Output("\t}\n");
 		}
 	};
@@ -260,5 +283,43 @@ MinimalMemberChangeset::Pack(pMemberChangeset);
 
 			$pObject->Output();
 		}
+
+		Output("\n");
+		Output("\tclass NetObjectStatic\n");
+		Output("\t{\n");
+			for ($i = 0; $i < sizeof($pObjectArray); $i++)
+			{
+				if ($i > 0)
+					Output("\n");
+
+				$pObject = $pObjectArray[$i];
+				$sPostFix = "";
+				if (is_a($pObject, "NetObject"))
+					$sPostFix = "Info";
+				Output("\t\tpublic " . $pObject->m_sName . $sPostFix . "* m_p" . $pObject->m_sName . $sPostFix . ";");
+				// info vs filter...
+			}
+			Output("\n");
+			Output("\t\tpublic construct()\n");
+			Output("\t\t{\n");
+			for ($i = 0; $i < sizeof($pObjectArray); $i++)
+			{
+				$pObject = $pObjectArray[$i];
+				$sPostFix = "";
+				if (is_a($pObject, "NetObject"))
+					$sPostFix = "Info";
+				Output("\t\t\tm_p" . $pObject->m_sName . $sPostFix . " = own new " . $pObject->m_sName . $sPostFix . "();\n");
+			}
+			Output("\t\t}\n");
+
+			/*Output("\t\tpublic destruct()\n");
+			Output("\t\t{\n");
+			for ($i = 0; $i < sizeof($pObjectArray); $i++)
+			{
+				$pObject = $pObjectArray[$i];
+				Output("\t\t\tm_p" . $pObject->m_sName . ".__pStatic = null;\n");
+			}
+			Output("\t\t}\n");*/
+		Output("\t}\n");
 	}
 ?>

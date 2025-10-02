@@ -6,7 +6,9 @@ namespace NumbatLogic
 		{
 			public enum Type {
 				UINT32,
-				STRING
+				STRING,
+				OBJECT,
+				OBJECT_VECTOR
 			}
 
 			public Type __eType;
@@ -16,32 +18,32 @@ namespace NumbatLogic
 
 		class Info
 		{
-			//public 
 			public OwnedVector<FieldInfo>* __pFieldInfoVector;
+		}
+
+		class Filter
+		{
+			public Vector<Filter>* __bFieldFilterVector;
 		}
 
 		class Object
 		{
-			public Info* __pInfo;
-
+			public Info __pInfo;
+			public Filter __pFilter;
 
 			// todo: NLL needs fixed array tech...
-			/*public Vector<Uint32>* __pUint32Vector;
+			public Vector<Uint32>* __pUint32Vector;
 			public OwnedVector<InternalString>* __pStringVector;
 
-			public void Pack(gsBlob pBlob)
+			public construct(Info pInfo, Filter pFilter)
 			{
-
-			}*/
-
+				__pInfo = pInfo;
+				__pFilter = pFilter;
+			}
 		}
 
 
-		class Filter
-		{
-			public Vector<bool>* __bVisibleVector;
-			public OwnedVector<Filter>* __pChildFilterVector;
-		}
+		
 	}
 
 /*

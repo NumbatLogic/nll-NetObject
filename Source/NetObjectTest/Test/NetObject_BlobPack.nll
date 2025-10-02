@@ -35,8 +35,17 @@ namespace NumbatLogic
 		?>*/
 			class ChildInfo : NetObject::Info
 			{
+				public static ChildInfo __pStatic = null;
 				public construct()
 				{
+					Assert::Plz(__pStatic == null);
+					__pStatic = this;
+				}
+				public destruct() { __pStatic = null; }
+				public static ChildInfo GetStatic()
+				{
+					Assert::Plz(__pStatic != null);
+					return __pStatic;
 				}
 			}
 
@@ -45,7 +54,7 @@ namespace NumbatLogic
 				public Uint32 __nChildId;
 				public InternalString* __sName;
 
-				public construct()
+				public construct(NetObject::Filter pFilter = null) : base(ChildInfo::GetStatic(), pFilter)
 				{
 					__sName = own new InternalString("");
 				}
@@ -73,8 +82,17 @@ namespace NumbatLogic
 
 			class ParentInfo : NetObject::Info
 			{
+				public static ParentInfo __pStatic = null;
 				public construct()
 				{
+					Assert::Plz(__pStatic == null);
+					__pStatic = this;
+				}
+				public destruct() { __pStatic = null; }
+				public static ParentInfo GetStatic()
+				{
+					Assert::Plz(__pStatic != null);
+					return __pStatic;
 				}
 			}
 
@@ -83,7 +101,7 @@ namespace NumbatLogic
 				public Uint32 __nParentId;
 				public Child* __pChild;
 
-				public construct()
+				public construct(NetObject::Filter pFilter = null) : base(ParentInfo::GetStatic(), pFilter)
 				{
 				}
 
@@ -108,8 +126,28 @@ namespace NumbatLogic
 				}
 			}
 
-			class ParentFilterInfo : NetObject::Filter
+			class ParentFilter : NetObject::Filter
 			{
+				public static ParentFilter __pStatic = null;
+				public construct()
+				{
+					Assert::Plz(__pStatic == null);
+					__pStatic = this;
+				}
+				public destruct() { __pStatic = null; }
+			}
+
+			class NetObjectStatic
+			{
+				public ChildInfo* m_pChildInfo;
+				public ParentInfo* m_pParentInfo;
+				public ParentFilter* m_pParentFilter;
+				public construct()
+				{
+					m_pChildInfo = own new ChildInfo();
+					m_pParentInfo = own new ParentInfo();
+					m_pParentFilter = own new ParentFilter();
+				}
 			}
 		/*<??>*/
 
@@ -117,12 +155,14 @@ namespace NumbatLogic
 		{
 			public static void Run()
 			{
+				NetObjectStatic* pStaticInfo = own new NetObjectStatic();
+
 				Parent* pObjectA = own new Parent();
 				pObjectA.__nParentId = 1234;
 				pObjectA.__pChild = own new Child();
 				pObjectA.__pChild.__nChildId = 2222;
 				pObjectA.__pChild.__sName.Set("banana");
-				
+
 				gsBlob* pBlob = own new gsBlob();
 				pObjectA.Pack(pBlob);
 				
