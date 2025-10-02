@@ -1,68 +1,141 @@
 namespace NumbatLogic
 {
-	/*<?
-		include_once "../../Metaprogramming.php";
-
-		$pObjectArray[] = new NetObject("TestObject",
-			[
-				new NetObjectField("Uint32", "TestId", false),
-				new NetObjectField("string", "Name", false),
-			]
-		);
-		NetObject_Header($pObjectArray);
-	?>*/
-		class TestObject : NetObject
-		{
-			public Uint32 __nTestId;
-			public InternalString* __sName;
-
-			public construct()
-			{
-				__sName = own new InternalString("");
-			}
-
-			public Uint32 GetTestId() { return __nTestId; }
-			public string GetName() { return __sName.GetExternalString(); }
-
-			public void Pack(gsBlob pBlob)
-			{
-				pBlob.PackUint32(__nTestId);
-				pBlob.PackInternalString(__sName);
-			}
-			public bool Unpack(gsBlob pBlob)
-			{
-				return pBlob.UnpackUint32(__nTestId) &&
-						pBlob.UnpackInternalString(__sName);
-			}
-
-			public bool IsEqual(TestObject pOther)
-			{
-				return __nTestId == pOther.__nTestId &&
-						__sName.IsEqual(pOther.__sName.GetExternalString());
-			}
-		}
-
-	/*<??>*/
-
-	class NetObject_BlobPack
+	namespace NetObject_BlobPack
 	{
-		public static void Run()
+		/*<?
+			include_once "../../Metaprogramming.php";
+
+			$pOutputArray = array();
+
+			$pObjectChild = new NetObject("Child",
+				[
+					new NetObjectField("Uint32", "ChildId", false),
+					new NetObjectField("string", "Name", false),
+				]
+			);
+			$pOutputArray[] = $pObjectChild;
+
+			$pObjectParent = new NetObject("Parent",
+				[
+					new NetObjectField("Uint32", "ParentId", false),
+					new NetObjectField("Child", "Child", false),
+				]
+			);
+			$pOutputArray[] = $pObjectParent;
+
+			$pFilterParent = new NetObjectFilter("ParentFilter", "Parent", array(
+				"TestId" => true,
+				"Child" => array(
+					"ChildId" => true
+				)
+			));
+			$pOutputArray[] = $pFilterParent;
+
+			NetObject_Output($pOutputArray);
+		?>*/
+			class ChildInfo : NetObject::Info
+			{
+				public construct()
+				{
+				}
+			}
+
+			class Child : NetObject::Object
+			{
+				public Uint32 __nChildId;
+				public InternalString* __sName;
+
+				public construct()
+				{
+					__sName = own new InternalString("");
+				}
+
+				public Uint32 GetChildId() { return __nChildId; }
+				public string GetName() { return __sName.GetExternalString(); }
+
+				public void Pack(gsBlob pBlob, voidptr pFieldFilter = null)
+				{
+					pBlob.PackUint32(__nChildId);
+					pBlob.PackInternalString(__sName);
+				}
+				public bool Unpack(gsBlob pBlob)
+				{
+					return pBlob.UnpackUint32(__nChildId) &&
+							pBlob.UnpackInternalString(__sName);
+				}
+
+				public bool IsEqual(Child pOther)
+				{
+					return __nChildId == pOther.__nChildId &&
+							__sName.IsEqual(pOther.__sName.GetExternalString());
+				}
+			}
+
+			class ParentInfo : NetObject::Info
+			{
+				public construct()
+				{
+				}
+			}
+
+			class Parent : NetObject::Object
+			{
+				public Uint32 __nParentId;
+				public Child* __pChild;
+
+				public construct()
+				{
+				}
+
+				public Uint32 GetParentId() { return __nParentId; }
+				public Child GetChild() { return __pChild; }
+
+				public void Pack(gsBlob pBlob, voidptr pFieldFilter = null)
+				{
+					pBlob.PackUint32(__nParentId);
+					__pChild.Pack(pBlob);
+				}
+				public bool Unpack(gsBlob pBlob)
+				{
+					return pBlob.UnpackUint32(__nParentId) &&
+							__pChild.Unpack(pBlob);
+				}
+
+				public bool IsEqual(Parent pOther)
+				{
+					return __nParentId == pOther.__nParentId &&
+							__pChild == pOther.__pChild;
+				}
+			}
+
+			class ParentFilterInfo : NetObject::Filter
+			{
+			}
+		/*<??>*/
+
+		class Test
 		{
-			TestObject* pObjectA = own new TestObject();
-			pObjectA.__nTestId = 1234;
-			pObjectA.__sName.Set("banana");
-			gsBlob* pBlob = own new gsBlob();
-			pObjectA.Pack(pBlob);
-			
-			pBlob.SetOffset(0);
+			public static void Run()
+			{
+				Parent* pObjectA = own new Parent();
+				pObjectA.__nParentId = 1234;
+				pObjectA.__pChild = own new Child();
+				pObjectA.__pChild.__nChildId = 2222;
+				pObjectA.__pChild.__sName.Set("banana");
+				
+				gsBlob* pBlob = own new gsBlob();
+				pObjectA.Pack(pBlob);
+				
+				pBlob.SetOffset(0);
 
-			TestObject* pObjectB = own new TestObject();
-			Assert::Plz(pObjectB.Unpack(pBlob));
-			Assert::Plz(pObjectB.IsEqual(pObjectA));
+				Parent* pObjectB = own new Parent();
+				Assert::Plz(pObjectB.Unpack(pBlob));
+				Assert::Plz(pObjectB.IsEqual(pObjectA));
 
-			TestObject* pObjectC = own new TestObject();
-			Assert::Plz(!pObjectC.Unpack(pBlob));
-			Assert::Plz(!pObjectC.IsEqual(pObjectA));
+				Parent* pObjectC = own new Parent();
+				Assert::Plz(!pObjectC.Unpack(pBlob));
+				Assert::Plz(!pObjectC.IsEqual(pObjectA));
+			}
 		}
 	}
 } 

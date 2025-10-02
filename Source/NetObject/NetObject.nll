@@ -1,25 +1,50 @@
 namespace NumbatLogic
 {
-	class NetObject
+	namespace NetObject
 	{
-	}
+		class FieldInfo
+		{
+			public enum Type {
+				UINT32,
+				STRING
+			}
 
-	/*class NetObjectFieldInfo
-	{
-		public enum Type {
-			UINT32,
-			STRING
+			public Type __eType;
+			public InternalString* __sName;
+			public int __nDataIndex;
 		}
 
-		public Type __eType;
-		public InternalString* __sName;
+		class Info
+		{
+			//public 
+			public OwnedVector<FieldInfo>* __pFieldInfoVector;
+		}
+
+		class Object
+		{
+			public Info* __pInfo;
+
+
+			// todo: NLL needs fixed array tech...
+			/*public Vector<Uint32>* __pUint32Vector;
+			public OwnedVector<InternalString>* __pStringVector;
+
+			public void Pack(gsBlob pBlob)
+			{
+
+			}*/
+
+		}
+
+
+		class Filter
+		{
+			public Vector<bool>* __bVisibleVector;
+			public OwnedVector<Filter>* __pChildFilterVector;
+		}
 	}
 
-	class NetObjectInfo
-	{
-		public OwnedVector<NetObjectInfo>* __pFieldVector;
-	}
-
+/*
 	// pUmi = pUserMonsterInfo.CreatePartial();
 	// pUmp.ExposeField("nMonsterId");
 
@@ -38,7 +63,6 @@ namespace NumbatLogic
 
 
 	// supsets?
-
 
 
 
