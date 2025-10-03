@@ -6,8 +6,8 @@
 	{
 		switch ($sType)
 		{
-			case "string": return "s";
 			case "Uint32": return "n";
+			case "string": return "s";
 		}
 		return "p";
 	}
@@ -17,12 +17,14 @@
 		public string $m_sType;
 		public string $m_sName;
 		public bool $m_bVector;
+		public int $m_nDataIndex;
 
 		function __construct(string $sType, string $sName, bool $bVector)
 		{
 			$this->m_sType = $sType;
 			$this->m_sName = $sName;
 			$this->m_bVector = $bVector;
+			$this->m_nDataIndex = 0;
 		}
 
 		function GetMemberType()
@@ -58,6 +60,25 @@
 				return "InternalString";
 			return $this->m_sType;
 		}
+
+		function GetDataType()
+		{
+			if ($this->IsBasicType())
+				return $this->m_sType;
+			if ($this->IsString())
+				return "String";
+			return "Object"; // todo vector
+		}
+
+		function GetFieldInfoType()
+		{
+			switch ($this->m_sType)
+			{
+				case "Uint32": return "NetObject::FieldInfo::Type::UINT32";
+				case "string": return "NetObject::FieldInfo::Type::STRING";
+			}
+			return "NetObject::FieldInfo::Type::OBJECT";
+		}
 	}
 
 
@@ -65,54 +86,25 @@
 	{
   		public $m_sName;
 		public $m_pFieldArray;
+		public $m_nDataSizeMap;
   		
 		function __construct(string $sName, array $pFieldArray)
 		{
 			$this->m_sName = $sName;
 			$this->m_pFieldArray = $pFieldArray;
-		}
 
+			$this->m_nDataSizeMap = array(
+				"Uint32" => 0,
+				"String" => 0,
+				"Vector" => 0,
+				"Object" => 0);
 
-/*should partial objects be distinct?
-or just a expose list?
-
-MinimalMember::SubPack(pMember);
-changesets woudl be weird with this?
-
-MinimalMemberChangeset::Pack(pMemberChangeset);
-// this is just sugar for pMemberChangeset.Pack(privacy struct);
-// toplevel can hardcode at the partial class level, can use exposure array at lower levels?
-
-// client can hard crash if server accedentally packs wihout expose filter
-// so we shouldn't accedentally pack secrets...
-*/
-
-		/*public static function CreatePartial(string $sName, NetObject $pBaseObject, array $sExposedFieldArray)
-		{
-			$pFieldArray = array();
-			for ($i = 0; $i < sizeof($sExposedFieldArray); $i++)
+			for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
 			{
-				$sExposedField = $sExposedFieldArray[$i];
-
-				$j = 0;
-				$pBaseField = null;
-				for ($j = 0; $j < sizeof($pBaseObject->m_pFieldArray); $j++)
-				{
-					$pBaseField = $pBaseObject->m_pFieldArray[$j];
-					if ($pBaseField->m_sName == $sExposedField)
-						break;
-				}
-
-				if ($j >= sizeof($pBaseObject->m_pFieldArray))
-					throw new Exception("not found!!!");
-
-				$pFieldArray[] = $pBaseField;
+				$pField = $this->m_pFieldArray[$j];
+				$pField->m_nDataIndex = $this->m_nDataSizeMap[$pField->GetDataType()]++;
 			}
-
-			$pNetObject = new NetObject($sName, $pFieldArray);
-
-			return $pNetObject;
-		}*/
+		}
 
 		public function Output()
 		{
@@ -125,15 +117,19 @@ MinimalMemberChangeset::Pack(pMemberChangeset);
 			Output("\tclass " . $this->m_sName . "Info : NetObject::Info\n");
 			Output("\t{\n");
 				Output("\t\tpublic static " . $this->m_sName . "Info __pStatic = null;\n");
-				Output("\t\tpublic construct()\n");
+				Output("\t\tpublic construct() : base(");
+					Output("" . $this->m_nDataSizeMap["Uint32"]);
+					Output(", " . $this->m_nDataSizeMap["String"]);
+					Output(", " . $this->m_nDataSizeMap["Object"]);
+					Output(", " . $this->m_nDataSizeMap["Vector"]);
+				Output(")\n");
 				Output("\t\t{\n");
 				Output("\t\t\tAssert::Plz(__pStatic == null);\n");
 				Output("\t\t\t__pStatic = this;\n");
 				for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
 				{
 					$pField = $this->m_pFieldArray[$j];
-
-				//	Output("\t\t\t__pFieldInfoVector.PushBack(new NetObject::FieldInfo(TYPE, \"" . $pField->GetMemberName() . "\"));\n");
+					Output("\t\t\t__pFieldInfoVector.PushBack(new NetObject::FieldInfo(" . $pField->GetFieldInfoType() . ", \"" . $pField->m_sName . "\", " . $pField->m_nDataIndex . "));\n");
 				}
 				Output("\t\t}\n");
 				Output("\t\tpublic destruct() { __pStatic = null; }\n");
@@ -143,101 +139,41 @@ MinimalMemberChangeset::Pack(pMemberChangeset);
 					Output("\t\t\tAssert::Plz(__pStatic != null);\n");
 					Output("\t\t\treturn __pStatic;\n");
 				Output("\t\t}\n");
+
+				if ($this->m_nDataSizeMap["Object"] + $this->m_nDataSizeMap["Vector"] > 0)
+				{
+					Output("\t\tpublic override NetObject::Object** __CreateChildObject(int nFieldIndex, NetObject::Filter pFilter)\n");
+					Output("\t\t{\n");
+						Output("\t\t\tswitch (nFieldIndex)\n");
+						Output("\t\t\t{\n");
+							for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
+							{
+								$pField = $this->m_pFieldArray[$j];
+								if ($pField->IsCustomType())
+									Output("\t\t\t\tcase " . $j . ": return new " . $pField->m_sName . "();\n");
+							}
+						Output("\t\t\t}\n");
+						Output("\t\t\tAssert::Plz(false);\n");
+						Output("\t\t\treturn null;\n");
+					Output("\t\t}\n");
+				}
 			Output("\t}\n");
 			Output("\n");
 
-
-
-
-
 			Output("\tclass " . $this->m_sName . " : NetObject::Object\n");
 			Output("\t{\n");
-
-			for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
-			{
-				$pField = $this->m_pFieldArray[$j];
-
-				Output("\t\tpublic " . $pField->GetMemberType());
-				if ($pField->IsCustomType())
-					Output("*");
-				Output(" " . $pField->GetMemberName() . ";\n");
-			}
-			Output("\n");
-
-			Output("\t\tpublic construct(NetObject::Filter pFilter = null) : base(" . $this->m_sName . "Info::GetStatic(), pFilter)\n");
-			Output("\t\t{\n");
-			for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
-			{
-				$pField = $this->m_pFieldArray[$j];
-				if ($pField->IsString())
-					Output("\t\t\t" . $pField->GetMemberName() . " = own new InternalString(\"\");\n");
-			}
-			Output("\t\t}\n");
-			Output("\n");
-
-			for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
-			{
-				$pField = $this->m_pFieldArray[$j];
-				Output("\t\tpublic " . $pField->m_sType . " Get" . $pField->m_sName . "() { ");
-				Output("return " . $pField->GetMemberName());
-				if ($pField->IsString())
-					Output(".GetExternalString()");
-				Output("; }\n");
-			}
-			Output("\n");
-
-			// blob
-			Output("\t\tpublic void Pack(gsBlob pBlob, voidptr pFieldFilter = null)\n");
-			Output("\t\t{\n");
-			for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
-			{
-				$pField = $this->m_pFieldArray[$j];
-
-				if ($pField->IsCustomType())
-					Output("\t\t\t" . $pField->GetMemberName() . ".Pack(pBlob);\n");
-				else
-					Output("\t\t\tpBlob.Pack" . $pField->GetBlobPackType() . "(" . $pField->GetMemberName() . ");\n");
-			}
-			Output("\t\t}\n");
-
-			Output("\t\tpublic bool Unpack(gsBlob pBlob)\n");
-			Output("\t\t{\n");
-
-			Output("\t\t\treturn ");
-
-			for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
-			{
-				$pField = $this->m_pFieldArray[$j];
-				if ($j > 0)
-					Output(" &&\n\t\t\t\t\t");
-				if ($pField->IsCustomType())
-					Output($pField->GetMemberName() . ".Unpack(pBlob)");
-				else
-					Output("pBlob.Unpack" . $pField->GetBlobPackType() . "(" . $pField->GetMemberName() . ")");
-			}
-			Output(";\n");
-			Output("\t\t}\n");
-			Output("\n");
-
-			// IsEqual
-			Output("\t\tpublic bool IsEqual(" . $this->m_sName . " pOther)\n");
-			Output("\t\t{\n");
-
-			Output("\t\t\treturn ");
-
-			for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
-			{
-				$pField = $this->m_pFieldArray[$j];
-				if ($j > 0)
-					Output(" &&\n\t\t\t\t\t");
-				if ($pField->IsString())
-					Output($pField->GetMemberName() . ".IsEqual(pOther." . $pField->GetMemberName() . ".GetExternalString())");
-				else
-					Output($pField->GetMemberName() . " == pOther." . $pField->GetMemberName());
-			}
-			Output(";\n");
-			Output("\t\t}\n");
-
+				Output("\t\tpublic construct(NetObject::Filter pFilter = null) : base(" . $this->m_sName . "Info::GetStatic()");
+				Output(", pFilter) { }\n");
+				for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
+				{
+					$pField = $this->m_pFieldArray[$j];
+					Output("\t\tpublic " . $pField->m_sType . " Get" . $pField->m_sName . "() { ");
+					if ($pField->IsCustomType())
+						Output("return cast " . $pField->m_sType . "(Get" . $pField->GetDataType() . "(" . $pField->m_nDataIndex . "));");
+					else
+						Output("return Get" . $pField->GetDataType() . "(" . $pField->m_nDataIndex . ");");
+					Output(" }\n");
+				}
 			Output("\t}\n");
 		}
 	};
@@ -272,7 +208,7 @@ MinimalMemberChangeset::Pack(pMemberChangeset);
 		}
 	};
 
-	function NetObject_Output($pObjectArray)
+	function NetObject_Output($pObjectArray, $sContainerName = "NetObjectStatic")
 	{
 		for ($i = 0; $i < sizeof($pObjectArray); $i++)
 		{
@@ -280,12 +216,11 @@ MinimalMemberChangeset::Pack(pMemberChangeset);
 				Output("\n");
 
 			$pObject = $pObjectArray[$i];
-
 			$pObject->Output();
 		}
 
 		Output("\n");
-		Output("\tclass NetObjectStatic\n");
+		Output("\tclass " . $sContainerName . "\n");
 		Output("\t{\n");
 			for ($i = 0; $i < sizeof($pObjectArray); $i++)
 			{
@@ -311,15 +246,6 @@ MinimalMemberChangeset::Pack(pMemberChangeset);
 				Output("\t\t\tm_p" . $pObject->m_sName . $sPostFix . " = own new " . $pObject->m_sName . $sPostFix . "();\n");
 			}
 			Output("\t\t}\n");
-
-			/*Output("\t\tpublic destruct()\n");
-			Output("\t\t{\n");
-			for ($i = 0; $i < sizeof($pObjectArray); $i++)
-			{
-				$pObject = $pObjectArray[$i];
-				Output("\t\t\tm_p" . $pObject->m_sName . ".__pStatic = null;\n");
-			}
-			Output("\t\t}\n");*/
 		Output("\t}\n");
 	}
 ?>

@@ -11,14 +11,42 @@ namespace NumbatLogic
 				OBJECT_VECTOR
 			}
 
+			// todo some checksums
+
 			public Type __eType;
 			public InternalString* __sName;
 			public int __nDataIndex;
+
+			public construct(Type eType, string sxName, int nDataIndex)
+			{
+				__eType = eType;
+				__sName = own new InternalString(sxName);
+				__nDataIndex = nDataIndex;
+			}
 		}
 
 		class Info
 		{
+			public int __nNumUint32;
+			public int __nNumString;
+			public int __nNumObject;
+			public int __nNumVector;
 			public OwnedVector<FieldInfo>* __pFieldInfoVector;
+
+			public construct(int nNumUint32, int nNumString, int nNumObject, int nNumVector)
+			{
+				__nNumUint32 = nNumUint32;
+				__nNumString = nNumString;
+				__nNumObject = nNumObject;
+				__nNumVector = nNumVector;
+				__pFieldInfoVector = own new OwnedVector<FieldInfo>();
+			}
+
+			public virtual Object** __CreateChildObject(int nFieldIndex, Filter pFilter)
+			{
+				Assert::Plz(false);
+				return null;
+			}
 		}
 
 		class Filter
@@ -34,84 +62,239 @@ namespace NumbatLogic
 			// todo: NLL needs fixed array tech...
 			public Vector<Uint32>* __pUint32Vector;
 			public OwnedVector<InternalString>* __pStringVector;
+			public OwnedVector<Object>* __pObjectVector;
+			public OwnedVector<OwnedVector<Object>!>* __pVectorVector;
 
 			public construct(Info pInfo, Filter pFilter)
 			{
 				__pInfo = pInfo;
 				__pFilter = pFilter;
+				if (__pInfo.__nNumUint32 > 0)
+				{
+					__pUint32Vector = own new Vector<Uint32>();
+					for (int i = 0; i < __pInfo.__nNumUint32; i++)
+						__pUint32Vector.PushBack(0);
+				}
+				if (__pInfo.__nNumString > 0)
+				{
+					__pStringVector = own new OwnedVector<InternalString>();
+					for (int i = 0; i < __pInfo.__nNumString; i++)
+						__pStringVector.PushBack(null);
+				}
+				if (__pInfo.__nNumObject > 0)
+				{
+					__pObjectVector = own new OwnedVector<Object>();
+					for (int i = 0; i < __pInfo.__nNumObject; i++)
+						__pObjectVector.PushBack(null);
+				}
+				if (__pInfo.__nNumVector > 0)
+				{
+					__pVectorVector = own new OwnedVector<OwnedVector<Object>!>();
+					for (int i = 0; i < __pInfo.__nNumVector; i++)
+						__pVectorVector.PushBack(null);
+				}
+			}
+
+			// todo: filter
+			// todo: pack checksum
+			public void Pack(gsBlob pBlob)
+			{
+				for (int i = 0; i < __pInfo.__pFieldInfoVector.GetSize(); i++)
+				{
+					FieldInfo pInfo = __pInfo.__pFieldInfoVector.Get(i);
+					switch (pInfo.__eType)
+					{
+						case FieldInfo::Type::UINT32:
+						{
+							pBlob.PackUint32(__pUint32Vector.Get(pInfo.__nDataIndex));
+							break;
+						}
+						case FieldInfo::Type::STRING:
+						{
+							InternalString sTemp = __pStringVector.Get(pInfo.__nDataIndex);
+							if (sTemp == null)
+							{
+								pBlob.PackUint8(0);
+							}
+							else
+							{
+								pBlob.PackUint8(1); // todo: excess byte!
+								pBlob.PackInternalString(sTemp);
+							}
+							break;
+						}
+						case FieldInfo::Type::OBJECT:
+						{
+							Object pObject = __pObjectVector.Get(pInfo.__nDataIndex);
+							if (pObject == null)
+							{
+								pBlob.PackUint8(0);
+							}
+							else
+							{
+								pBlob.PackUint8(1);
+								pObject.Pack(pBlob);
+							}
+							break;
+						}
+						default:
+						{
+							Assert::Plz(false);
+						}
+					}
+				}
+			}
+
+			public bool Unpack(gsBlob pBlob)
+			{
+				for (int i = 0; i < __pInfo.__pFieldInfoVector.GetSize(); i++)
+				{
+					FieldInfo pInfo = __pInfo.__pFieldInfoVector.Get(i);
+					switch (pInfo.__eType)
+					{
+						case FieldInfo::Type::UINT32:
+						{
+							Uint32 n;
+							if (!pBlob.UnpackUint32(n))
+								return false;
+							__pUint32Vector.Set(pInfo.__nDataIndex, n);
+							break;
+						}
+						case FieldInfo::Type::STRING:
+						{
+							Uint8 nFlag;
+							if (!pBlob.UnpackUint8(nFlag))
+								return false;
+							
+							InternalString sTemp = __pStringVector.Get(pInfo.__nDataIndex);
+							if (nFlag == 0)
+							{
+								if (sTemp != null)
+								{
+									// todo: not very performant over just setting to null in place!!!
+									__pStringVector.Erase(pInfo.__nDataIndex);
+									__pStringVector.Insert(pInfo.__nDataIndex, null);
+								}
+							}
+							else
+							{
+								if (sTemp == null)
+								{
+									InternalString* sOwned = own new InternalString("");
+									sTemp = sOwned;
+									__pStringVector.Set(pInfo.__nDataIndex, disown sOwned);
+								}
+
+								if (!pBlob.UnpackInternalString(sTemp))
+									return false;
+							}
+							break;
+						}
+						case FieldInfo::Type::OBJECT:
+						{
+							Uint8 nFlag;
+							if (!pBlob.UnpackUint8(nFlag))
+								return false;
+							
+							Object pObject = __pObjectVector.Get(pInfo.__nDataIndex);
+							if (nFlag == 0)
+							{
+								if (pObject != null)
+								{
+									// todo: not very performant over just setting to null in place!!!
+									__pObjectVector.Erase(pInfo.__nDataIndex);
+									__pObjectVector.Insert(pInfo.__nDataIndex, null);
+								}
+							}
+							else
+							{
+								if (pObject == null)
+								{
+									Object* pOwned = own __pInfo.__CreateChildObject(i, __pFilter);
+									pObject = pOwned;
+									__pObjectVector.Set(pInfo.__nDataIndex, disown pOwned);
+								}
+
+								if (!pObject.Unpack(pBlob))
+									return false;
+							}
+							break;
+						}
+						default:
+						{
+							Assert::Plz(false);
+						}
+					}
+				}
+				return true;
+			}
+
+			// filter???
+			public bool IsEqual(Object pOther)
+			{
+				Assert::Plz(__pInfo == pOther.__pInfo);
+
+				for (int i = 0; i < __pInfo.__nNumUint32; i++)
+					if (__pUint32Vector.Get(i) != pOther.__pUint32Vector.Get(i))
+						return false;
+
+				for (int i = 0; i < __pInfo.__nNumString; i++)
+				{
+					InternalString sTemp = __pStringVector.Get(i);
+					InternalString sOther = pOther.__pStringVector.Get(i);
+
+					if (sTemp == null || sTemp.IsEqual(""))
+					{
+						if (sOther != null && !sOther.IsEqual(""))
+							return false;
+					}
+					else
+					{
+						if (sOther == null || !sTemp.IsEqual(sOther.GetExternalString()))
+							return false;
+					}
+				}
+
+				for (int i = 0; i < __pInfo.__nNumObject; i++)
+				{
+					Object pA = __pObjectVector.Get(i);
+					Object pB = pOther.__pObjectVector.Get(i);
+
+					if (pA == null)
+					{
+						if (pB != null)
+							return false;
+					}
+					else
+					{
+						if (pB == null || !pA.IsEqual(pB))
+							return false;
+					}
+				}
+				
+				Assert::Plz(__pInfo.__nNumVector == 0);
+
+				return true;
+			}
+
+			// todo: filter and range check!
+			public Uint32 GetUint32(int nIndex)
+			{
+				return __pUint32Vector.Get(nIndex);
+			}
+
+			public string GetString(int nIndex)
+			{
+				InternalString sTemp = __pStringVector.Get(nIndex);
+				if (sTemp == null)
+					return "";
+				return sTemp.GetExternalString();
+			}
+
+			public Object GetObject(int nIndex)
+			{
+				return __pObjectVector.Get(nIndex);
 			}
 		}
-
-
-		
 	}
-
-/*
-	// pUmi = pUserMonsterInfo.CreatePartial();
-	// pUmp.ExposeField("nMonsterId");
-
-	// p = pUserInfo.CreatePartial();
-	// p.ExposeField("nUserId");
-	// p.ExposeField("pMonsters", pUmi);
-
-
-	class NetObjectFiltered
-	{
-		public NetObjectInfo __pObjectInfo;
-
-		public OwnedVector<NetObjectInfo>* __pFieldVector;
-	}
-
-
-
-	// supsets?
-
-
-
-
-	class NetObjectField
-	{
-		public enum Type {
-			UINT32,
-			STRING
-		}
-
-		public Type __eType;
-		public Uint32 __nUint32;
-		private InternalString* __sString;
-		
-		public construct(Uint32 nUint32)
-		{
-			__eType = Type::UINT32;
-			__nUint32 = nUint32;
-		}
-
-		public construct(string sxString)
-		{
-			__eType = Type::STRING;
-			__sString = own new InternalString(sxString);
-		}
-	}
-
-	class NetObject
-	{
-		private OwnedVector<NetObjectField>* m_pFieldVector;
-
-
-	}
-
-
-
-	class NetObjectFieldChangeset
-	{
-		public int __nIndex;
-		//public int __nIndex;
-	}
-
-	class NetObjectChangeset
-	{
-		private OwnedVector<NetObjectField>* m_pFieldVector;
-
-
-	}*/
 }

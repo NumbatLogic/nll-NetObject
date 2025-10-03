@@ -36,10 +36,12 @@ namespace NumbatLogic
 			class ChildInfo : NetObject::Info
 			{
 				public static ChildInfo __pStatic = null;
-				public construct()
+				public construct() : base(1, 1, 0, 0)
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ChildId", 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::STRING, "Name", 0));
 				}
 				public destruct() { __pStatic = null; }
 				public static ChildInfo GetStatic()
@@ -51,42 +53,20 @@ namespace NumbatLogic
 
 			class Child : NetObject::Object
 			{
-				public Uint32 __nChildId;
-				public InternalString* __sName;
-
-				public construct(NetObject::Filter pFilter = null) : base(ChildInfo::GetStatic(), pFilter)
-				{
-					__sName = own new InternalString("");
-				}
-
-				public Uint32 GetChildId() { return __nChildId; }
-				public string GetName() { return __sName.GetExternalString(); }
-
-				public void Pack(gsBlob pBlob, voidptr pFieldFilter = null)
-				{
-					pBlob.PackUint32(__nChildId);
-					pBlob.PackInternalString(__sName);
-				}
-				public bool Unpack(gsBlob pBlob)
-				{
-					return pBlob.UnpackUint32(__nChildId) &&
-							pBlob.UnpackInternalString(__sName);
-				}
-
-				public bool IsEqual(Child pOther)
-				{
-					return __nChildId == pOther.__nChildId &&
-							__sName.IsEqual(pOther.__sName.GetExternalString());
-				}
+				public construct(NetObject::Filter pFilter = null) : base(ChildInfo::GetStatic(), pFilter) { }
+				public Uint32 GetChildId() { return GetUint32(0); }
+				public string GetName() { return GetString(0); }
 			}
 
 			class ParentInfo : NetObject::Info
 			{
 				public static ParentInfo __pStatic = null;
-				public construct()
+				public construct() : base(1, 0, 1, 0)
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ParentId", 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::OBJECT, "Child", 0));
 				}
 				public destruct() { __pStatic = null; }
 				public static ParentInfo GetStatic()
@@ -94,36 +74,22 @@ namespace NumbatLogic
 					Assert::Plz(__pStatic != null);
 					return __pStatic;
 				}
+				public override NetObject::Object** __CreateChildObject(int nFieldIndex, NetObject::Filter pFilter)
+				{
+					switch (nFieldIndex)
+					{
+						case 1: return new Child();
+					}
+					Assert::Plz(false);
+					return null;
+				}
 			}
 
 			class Parent : NetObject::Object
 			{
-				public Uint32 __nParentId;
-				public Child* __pChild;
-
-				public construct(NetObject::Filter pFilter = null) : base(ParentInfo::GetStatic(), pFilter)
-				{
-				}
-
-				public Uint32 GetParentId() { return __nParentId; }
-				public Child GetChild() { return __pChild; }
-
-				public void Pack(gsBlob pBlob, voidptr pFieldFilter = null)
-				{
-					pBlob.PackUint32(__nParentId);
-					__pChild.Pack(pBlob);
-				}
-				public bool Unpack(gsBlob pBlob)
-				{
-					return pBlob.UnpackUint32(__nParentId) &&
-							__pChild.Unpack(pBlob);
-				}
-
-				public bool IsEqual(Parent pOther)
-				{
-					return __nParentId == pOther.__nParentId &&
-							__pChild == pOther.__pChild;
-				}
+				public construct(NetObject::Filter pFilter = null) : base(ParentInfo::GetStatic(), pFilter) { }
+				public Uint32 GetParentId() { return GetUint32(0); }
+				public Child GetChild() { return cast Child(GetObject(0)); }
 			}
 
 			class ParentFilter : NetObject::Filter
@@ -150,7 +116,7 @@ namespace NumbatLogic
 				}
 			}
 		/*<??>*/
-
+		
 		class Test
 		{
 			public static void Run()
@@ -158,10 +124,21 @@ namespace NumbatLogic
 				NetObjectStatic* pStaticInfo = own new NetObjectStatic();
 
 				Parent* pObjectA = own new Parent();
-				pObjectA.__nParentId = 1234;
-				pObjectA.__pChild = own new Child();
-				pObjectA.__pChild.__nChildId = 2222;
-				pObjectA.__pChild.__sName.Set("banana");
+
+				Assert::Plz(pObjectA.GetParentId() == 0);
+				pObjectA.__pUint32Vector.Set(0, 1234);
+				Assert::Plz(pObjectA.GetParentId() == 1234);
+
+				pObjectA.__pObjectVector.Set(0, new Child());
+				Child pChild = pObjectA.GetChild();
+
+				Assert::Plz(pChild.GetChildId() == 0);
+				pChild.__pUint32Vector.Set(0, 2222);
+				Assert::Plz(pChild.GetChildId() == 2222);
+
+				Assert::Plz(ExternalString::Equal(pChild.GetName(), ""));
+				pChild.__pStringVector.Set(0, new InternalString("banana"));
+				Assert::Plz(ExternalString::Equal(pChild.GetName(), "banana"));
 
 				gsBlob* pBlob = own new gsBlob();
 				pObjectA.Pack(pBlob);
@@ -169,6 +146,7 @@ namespace NumbatLogic
 				pBlob.SetOffset(0);
 
 				Parent* pObjectB = own new Parent();
+				Assert::Plz(!pObjectB.IsEqual(pObjectA));
 				Assert::Plz(pObjectB.Unpack(pBlob));
 				Assert::Plz(pObjectB.IsEqual(pObjectA));
 
