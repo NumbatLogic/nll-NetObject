@@ -51,7 +51,31 @@ namespace NumbatLogic
 
 		class Filter
 		{
-			public Vector<Filter>* __bFieldFilterVector;
+			public Vector<bool>* __bExposeFieldVector;
+			public OwnedVector<Filter>* __pFieldFilterVector;
+
+			public construct(int nNumField)
+			{
+				__bExposeFieldVector = own new Vector<bool>();
+				__pFieldFilterVector = own new OwnedVector<Filter>();
+				for (int i = 0; i < nNumField; i++)
+				{
+					__bExposeFieldVector.PushBack(false);
+					__pFieldFilterVector.PushBack(null);
+				}
+			}
+
+			public void __ExposeField(int nIndex)
+			{
+				__bExposeFieldVector.Set(nIndex, true);
+			}
+
+			public Filter __ExposeFieldCreateFilter(int nIndex, int nNumFieldField)
+			{
+				__bExposeFieldVector.Set(nIndex, true);
+				__pFieldFilterVector.Set(nIndex, new Filter(nNumFieldField));
+				return __pFieldFilterVector.Get(nIndex);
+			}
 		}
 
 		class Object
@@ -358,21 +382,24 @@ namespace NumbatLogic
 			}
 
 			// todo: filter and range check!
-			public Uint32 __GetUint32(int nIndex)
+			public Uint32 __GetUint32(int nDataIndex, int nFieldIndex)
 			{
-				return __pUint32Vector.Get(nIndex);
+				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
+				return __pUint32Vector.Get(nDataIndex);
 			}
 
-			public string __GetString(int nIndex)
+			public string __GetString(int nIndex, int nFieldIndex)
 			{
+				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
 				InternalString sTemp = __pStringVector.Get(nIndex);
 				if (sTemp == null)
 					return "";
 				return sTemp.GetExternalString();
 			}
 
-			public Object __GetObject(int nIndex)
+			public Object __GetObject(int nIndex, int nFieldIndex)
 			{
+				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
 				return __pObjectVector.Get(nIndex);
 			}
 

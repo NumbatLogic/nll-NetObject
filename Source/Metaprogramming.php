@@ -152,12 +152,7 @@
 				}
 				Output("\t\t}\n");
 				Output("\t\tpublic destruct() { __pStatic = null; }\n");
-
-				Output("\t\tpublic static " . $this->m_sName . "Info GetStatic()\n");
-				Output("\t\t{\n");
-					Output("\t\t\tAssert::Plz(__pStatic != null);\n");
-					Output("\t\t\treturn __pStatic;\n");
-				Output("\t\t}\n");
+				Output("\t\tpublic static " . $this->m_sName . "Info GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }\n");
 
 				if ($this->m_nDataSizeMap["Object"] + $this->m_nDataSizeMap["Vector"] > 0)
 				{
@@ -241,9 +236,9 @@
 					{
 						Output("\t\tpublic " . $pField->m_sType . " Get" . $pField->m_sName . "() { ");
 						if ($pField->IsCustomType())
-							Output("return cast " . $pField->m_sType . "(__Get" . $pField->GetDataType() . "(" . $pField->m_nDataIndex . "));");
+							Output("return cast " . $pField->m_sType . "(__Get" . $pField->GetDataType() . "(" . $pField->m_nDataIndex . ", $j));");
 						else
-							Output("return __Get" . $pField->GetDataType() . "(" . $pField->m_nDataIndex . ");");
+							Output("return __Get" . $pField->GetDataType() . "(" . $pField->m_nDataIndex . ", $j);");
 						Output(" }\n");
 					}
 				}
@@ -255,29 +250,93 @@
 	{
   		public $m_sName;
 		public $m_sObjectName;
-		public $m_pFieldArray;
+		public $m_xFieldFilterMap;
   		
-		function __construct(string $sName, string $sObjectName, array $pFieldArray)
+		function __construct(string $sName, string $sObjectName, array $xFieldFilterMap)
 		{
 			$this->m_sName = $sName;
 			$this->m_sObjectName = $sObjectName;
-			$this->m_pFieldArray = $pFieldArray;
+			$this->m_xFieldFilterMap = $xFieldFilterMap;
 		}
 
 		public function Output(array $pObjectArray)
 		{
+			$i = 0;
+			$pObject = null;
+			for ($i = 0; $i < sizeof($pObjectArray); $i++)
+			{
+				$pObject = $pObjectArray[$i];
+				if ($pObject->m_sName == $this->m_sObjectName)
+					break;
+			}
+			if ($i >= sizeof($pObjectArray))
+				throw new Error("Object not found " . $this->m_sObjectName);
+			
 			Output("\tclass " . $this->m_sName . " : NetObject::Filter\n");
 			Output("\t{\n");
 
 				Output("\t\tpublic static " . $this->m_sName . " __pStatic = null;\n");
-				Output("\t\tpublic construct()\n");
+				Output("\t\tpublic construct() : base(" . sizeof($pObject->m_pFieldArray) . ")\n");
 				Output("\t\t{\n");
 				Output("\t\t\tAssert::Plz(__pStatic == null);\n");
 				Output("\t\t\t__pStatic = this;\n");
+
+				$this->SubOutput($pObject, $this->m_xFieldFilterMap, $pObjectArray, 3, "");
 				
 				Output("\t\t}\n");
 				Output("\t\tpublic destruct() { __pStatic = null; }\n");
+				Output("\t\tpublic static " . $this->m_sName . " GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }\n");
 			Output("\t}\n");
+		}
+
+		public function SubOutput($pObject, array $xFieldFilterMap, array $pObjectArray, $nDepth, $sPrefix)
+		{
+			foreach($xFieldFilterMap as $sField => $xValue)
+			{
+				$nFieldIndex = 0;
+				$pField = null;
+				for ($nFieldIndex = 0; $nFieldIndex < sizeof($pObject->m_pFieldArray); $nFieldIndex++)
+				{
+					$pField = $pObject->m_pFieldArray[$nFieldIndex];
+					if ($pField->m_sName == $sField)
+						break;
+				}
+				if ($nFieldIndex >= sizeof($pObject->m_pFieldArray))
+					throw new Error("coudn't find field " . $sField);
+
+				$sPadding = "";
+				for ($i = 0; $i < $nDepth; $i++)
+					$sPadding .= "\t";
+
+				if (is_array($xValue))
+				{
+					if (!$pField->IsCustomType())
+						throw new Error("Field " . $sField . " is not an object so cannot have nested filter!");
+
+					$i = 0;
+					$pFieldObject = null;
+					for ($i = 0; $i < sizeof($pObjectArray); $i++)
+					{
+						$pFieldObject = $pObjectArray[$i];
+						if ($pFieldObject->m_sName == $pField->m_sType)
+							break;
+					}
+
+					if ($i >= sizeof($pObjectArray))
+						throw new Error("Unable to find type for sub field " . $pField->m_sType);
+
+					Output($sPadding . "{\n");
+						Output($sPadding . "\tFilter p" . $nDepth . " = " . $sPrefix . "__ExposeFieldCreateFilter(" . $nFieldIndex . ", 999);\n");
+						$this->SubOutput($pFieldObject, $xValue, $pObjectArray, $nDepth+1, "p" . $nDepth . ".");
+					Output($sPadding . "}\n");
+				}
+				else
+				{
+					if ($xValue)
+						Output($sPadding . $sPrefix . "__ExposeField(" . $nFieldIndex . ");\n");
+				}
+			}
+			
 		}
 	};
 

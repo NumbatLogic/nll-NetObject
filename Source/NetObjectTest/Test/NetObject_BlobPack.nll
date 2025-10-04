@@ -19,18 +19,9 @@ namespace NumbatLogic
 				[
 					new NetObjectField("Uint32", "ParentId"),
 					new NetObjectField("Child", "Child"),
-					new NetObjectVectorField("Child", "Spawn", array("ChildId")),
 				]
 			);
 			$pOutputArray[] = $pObjectParent;
-
-			$pFilterParent = new NetObjectFilter("ParentFilter", "Parent", array(
-				"TestId" => true,
-				"Child" => array(
-					"ChildId" => true
-				)
-			));
-			$pOutputArray[] = $pFilterParent;
 
 			NetObject_Output($pOutputArray);
 		?>*/
@@ -45,43 +36,33 @@ namespace NumbatLogic
 					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::STRING, "Name", 0));
 				}
 				public destruct() { __pStatic = null; }
-				public static ChildInfo GetStatic()
-				{
-					Assert::Plz(__pStatic != null);
-					return __pStatic;
-				}
+				public static ChildInfo GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }
 			}
 
 			class Child : NetObject::Object
 			{
 				public construct(NetObject::Filter pFilter = null) : base(ChildInfo::GetStatic(), pFilter) { }
-				public Uint32 GetChildId() { return __GetUint32(0); }
-				public string GetName() { return __GetString(0); }
+				public Uint32 GetChildId() { return __GetUint32(0, 0); }
+				public string GetName() { return __GetString(0, 1); }
 			}
 
 			class ParentInfo : NetObject::Info
 			{
 				public static ParentInfo __pStatic = null;
-				public construct() : base(1, 0, 1, 1)
+				public construct() : base(1, 0, 1, 0)
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;
 					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ParentId", 0));
 					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::OBJECT, "Child", 0));
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::VECTOR, "Spawn", 0));
 				}
 				public destruct() { __pStatic = null; }
-				public static ParentInfo GetStatic()
-				{
-					Assert::Plz(__pStatic != null);
-					return __pStatic;
-				}
+				public static ParentInfo GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }
 				public override NetObject::Object** __CreateChildObject(int nFieldIndex, NetObject::Filter pFilter)
 				{
 					switch (nFieldIndex)
 					{
 						case 1: return new Child();
-						case 2: return new Child();
 					}
 					Assert::Plz(false);
 					return null;
@@ -91,34 +72,18 @@ namespace NumbatLogic
 			class Parent : NetObject::Object
 			{
 				public construct(NetObject::Filter pFilter = null) : base(ParentInfo::GetStatic(), pFilter) { }
-				public Uint32 GetParentId() { return __GetUint32(0); }
-				public Child GetChild() { return cast Child(__GetObject(0)); }
-				public int GetNumSpawn() { return __GetVectorSize(0); }
-				public Child GetSpawnByIndex(int nIndex) { return cast Child(__GetVectorObject(0, nIndex)); }
-				public Child GetSpawnByChildId(Uint32 nChildId) { return cast Child(__GetVectorObjectByUint32(0, 0, nChildId)); }
-			}
-
-			class ParentFilter : NetObject::Filter
-			{
-				public static ParentFilter __pStatic = null;
-				public construct()
-				{
-					Assert::Plz(__pStatic == null);
-					__pStatic = this;
-				}
-				public destruct() { __pStatic = null; }
+				public Uint32 GetParentId() { return __GetUint32(0, 0); }
+				public Child GetChild() { return cast Child(__GetObject(0, 1)); }
 			}
 
 			class NetObjectStatic
 			{
 				public ChildInfo* m_pChildInfo;
 				public ParentInfo* m_pParentInfo;
-				public ParentFilter* m_pParentFilter;
 				public construct()
 				{
 					m_pChildInfo = own new ChildInfo();
 					m_pParentInfo = own new ParentInfo();
-					m_pParentFilter = own new ParentFilter();
 				}
 			}
 		/*<??>*/
