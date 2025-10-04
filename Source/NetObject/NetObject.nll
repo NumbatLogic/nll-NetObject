@@ -8,7 +8,7 @@ namespace NumbatLogic
 				UINT32,
 				STRING,
 				OBJECT,
-				OBJECT_VECTOR
+				VECTOR
 			}
 
 			// todo some checksums
@@ -137,6 +137,24 @@ namespace NumbatLogic
 							}
 							break;
 						}
+						case FieldInfo::Type::VECTOR:
+						{
+							OwnedVector<Object> pVector = __pVectorVector.Get(pInfo.__nDataIndex);
+							if (pVector == null)
+							{
+								pBlob.PackUint16(0);
+							}
+							else
+							{
+								pBlob.PackUint16(pVector.GetSize());
+								for (int j = 0; j < pVector.GetSize(); j++)
+								{
+									Object pObject = pVector.Get(j);
+									pObject.Pack(pBlob);
+								}
+							}
+							break;
+						}
 						default:
 						{
 							Assert::Plz(false);
@@ -220,6 +238,38 @@ namespace NumbatLogic
 							}
 							break;
 						}
+						case FieldInfo::Type::VECTOR:
+						{
+							Uint16 nSize;
+							if (!pBlob.UnpackUint16(nSize))
+								return false;
+							
+							OwnedVector<Object> pVector = __pVectorVector.Get(pInfo.__nDataIndex);
+							if (nSize == 0)
+							{
+								if (pVector != null)
+									pVector.Clear();
+							}
+							else
+							{
+								if (pVector == null)
+								{
+									OwnedVector<Object>* pOwnedVector = own new OwnedVector<Object>();
+									pVector = pOwnedVector;
+									__pVectorVector.Set(pInfo.__nDataIndex, disown pOwnedVector);
+								}
+								pVector.Clear();
+
+								for (Uint16 j = 0; j < nSize; j++)
+								{
+									Object* pOwned = own __pInfo.__CreateChildObject(i, __pFilter);
+									if (!pOwned.Unpack(pBlob))
+										return false;
+									pVector.PushBack(disown pOwned);
+								}
+							}
+							break;
+						}
 						default:
 						{
 							Assert::Plz(false);
@@ -271,19 +321,49 @@ namespace NumbatLogic
 							return false;
 					}
 				}
-				
-				Assert::Plz(__pInfo.__nNumVector == 0);
 
+				for (int i = 0; i < __pInfo.__nNumVector; i++)
+				{
+					OwnedVector<Object> pVectorA = __pVectorVector.Get(i);
+					OwnedVector<Object> pVectorB = pOther.__pVectorVector.Get(i);
+
+					if (pVectorA == null || pVectorA.GetSize() == 0)
+					{
+						if (pVectorB != null && pVectorB.GetSize() > 0)
+							return false;
+					}
+					else
+					{
+						if (pVectorA.GetSize() != pVectorB.GetSize())
+							return false;
+
+						for (int j = 0; j < pVectorA.GetSize(); j++)
+						{
+							Object pA = pVectorA.Get(j);
+							Object pB = pVectorB.Get(j);
+							if (pA == null)
+							{
+								if (pB != null)
+									return false;
+							}
+							else if (pB == null || !pA.IsEqual(pB))
+							{
+								return false;
+							}
+						}
+					}
+				}
+				
 				return true;
 			}
 
 			// todo: filter and range check!
-			public Uint32 GetUint32(int nIndex)
+			public Uint32 __GetUint32(int nIndex)
 			{
 				return __pUint32Vector.Get(nIndex);
 			}
 
-			public string GetString(int nIndex)
+			public string __GetString(int nIndex)
 			{
 				InternalString sTemp = __pStringVector.Get(nIndex);
 				if (sTemp == null)
@@ -291,9 +371,70 @@ namespace NumbatLogic
 				return sTemp.GetExternalString();
 			}
 
-			public Object GetObject(int nIndex)
+			public Object __GetObject(int nIndex)
 			{
 				return __pObjectVector.Get(nIndex);
+			}
+
+			public int __GetVectorSize(int nIndex)
+			{
+				OwnedVector<Object> pVector = __pVectorVector.Get(nIndex);
+				if (pVector == null)
+					return 0;
+				return pVector.GetSize();
+			}
+
+			public Object __GetVectorObject(int nDataIndex, int nVectorIndex)
+			{
+				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
+				Assert::Plz(pVector != null);
+				Assert::Plz(nVectorIndex >= 0);
+				Assert::Plz(nVectorIndex <= pVector.GetSize());
+				
+				return pVector.Get(nVectorIndex);
+			}
+
+			public Object __GetVectorObjectByUint32(int nDataIndex, int nVectorObjectDataIndex, Uint32 nValue)
+			{
+				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
+				// todo: filter check (before vector check?)
+
+				if (pVector != null)
+				{
+					for (int i = 0; i < pVector.GetSize(); i++)
+					{
+						Object pVectorObject = pVector.Get(i);
+						if (pVectorObject.__pUint32Vector.Get(nVectorObjectDataIndex) == nValue)
+							return pVectorObject;
+					}
+				}
+				return null;
+			}
+
+			public Object __GetVectorObjectByString(int nDataIndex, int nVectorObjectDataIndex, string sxValue)
+			{
+				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
+
+				// todo: filter check
+
+				if (pVector != null)
+				{
+					for (int i = 0; i < pVector.GetSize(); i++)
+					{
+						Object pVectorObject = pVector.Get(i);
+						InternalString sTemp = pVectorObject.__pStringVector.Get(nVectorObjectDataIndex);
+						if (sTemp == null)
+						{
+							if (sxValue == null || ExternalString::Equal(sxValue, ""))
+								return pVectorObject;
+						}
+						else if (sTemp.IsEqual(sxValue))
+						{
+							return pVectorObject;
+						}
+					}
+				}
+				return null;
 			}
 		}
 	}

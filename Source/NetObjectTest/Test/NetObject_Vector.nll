@@ -1,6 +1,6 @@
 namespace NumbatLogic
 {
-	namespace NetObject_BlobPack
+	namespace NetObject_Vector
 	{
 		/*<?
 			include_once "../../Metaprogramming.php";
@@ -18,19 +18,10 @@ namespace NumbatLogic
 			$pObjectParent = new NetObject("Parent",
 				[
 					new NetObjectField("Uint32", "ParentId"),
-					new NetObjectField("Child", "Child"),
-					new NetObjectVectorField("Child", "Spawn", array("ChildId")),
+					new NetObjectVectorField("Child", "Spawn", array("ChildId", "Name")),
 				]
 			);
 			$pOutputArray[] = $pObjectParent;
-
-			$pFilterParent = new NetObjectFilter("ParentFilter", "Parent", array(
-				"TestId" => true,
-				"Child" => array(
-					"ChildId" => true
-				)
-			));
-			$pOutputArray[] = $pFilterParent;
 
 			NetObject_Output($pOutputArray);
 		?>*/
@@ -62,12 +53,11 @@ namespace NumbatLogic
 			class ParentInfo : NetObject::Info
 			{
 				public static ParentInfo __pStatic = null;
-				public construct() : base(1, 0, 1, 1)
+				public construct() : base(1, 0, 0, 1)
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;
 					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ParentId", 0));
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::OBJECT, "Child", 0));
 					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::VECTOR, "Spawn", 0));
 				}
 				public destruct() { __pStatic = null; }
@@ -81,7 +71,6 @@ namespace NumbatLogic
 					switch (nFieldIndex)
 					{
 						case 1: return new Child();
-						case 2: return new Child();
 					}
 					Assert::Plz(false);
 					return null;
@@ -92,33 +81,20 @@ namespace NumbatLogic
 			{
 				public construct(NetObject::Filter pFilter = null) : base(ParentInfo::GetStatic(), pFilter) { }
 				public Uint32 GetParentId() { return __GetUint32(0); }
-				public Child GetChild() { return cast Child(__GetObject(0)); }
 				public int GetNumSpawn() { return __GetVectorSize(0); }
 				public Child GetSpawnByIndex(int nIndex) { return cast Child(__GetVectorObject(0, nIndex)); }
 				public Child GetSpawnByChildId(Uint32 nChildId) { return cast Child(__GetVectorObjectByUint32(0, 0, nChildId)); }
-			}
-
-			class ParentFilter : NetObject::Filter
-			{
-				public static ParentFilter __pStatic = null;
-				public construct()
-				{
-					Assert::Plz(__pStatic == null);
-					__pStatic = this;
-				}
-				public destruct() { __pStatic = null; }
+				public Child GetSpawnByName(string sName) { return cast Child(__GetVectorObjectByString(0, 0, sName)); }
 			}
 
 			class NetObjectStatic
 			{
 				public ChildInfo* m_pChildInfo;
 				public ParentInfo* m_pParentInfo;
-				public ParentFilter* m_pParentFilter;
 				public construct()
 				{
 					m_pChildInfo = own new ChildInfo();
 					m_pParentInfo = own new ParentInfo();
-					m_pParentFilter = own new ParentFilter();
 				}
 			}
 		/*<??>*/
@@ -135,16 +111,32 @@ namespace NumbatLogic
 				pObjectA.__pUint32Vector.Set(0, 1234);
 				Assert::Plz(pObjectA.GetParentId() == 1234);
 
-				pObjectA.__pObjectVector.Set(0, new Child());
-				Child pChild = pObjectA.GetChild();
+				Assert::Plz(pObjectA.GetNumSpawn() == 0);
+				pObjectA.__pVectorVector.Set(0, new OwnedVector<NetObject::Object>());
+				Assert::Plz(pObjectA.GetNumSpawn() == 0);
+				OwnedVector<NetObject::Object> pVector = pObjectA.__pVectorVector.Get(0);
+				
+				pVector.PushBack(new Child());
+				Assert::Plz(pObjectA.GetNumSpawn() == 1);
+				Child pSpawnA = cast Child(pVector.Get(0));
+				pSpawnA.__pUint32Vector.Set(0, 2222);
+				Assert::Plz(pSpawnA.GetChildId() == 2222);
 
-				Assert::Plz(pChild.GetChildId() == 0);
-				pChild.__pUint32Vector.Set(0, 2222);
-				Assert::Plz(pChild.GetChildId() == 2222);
+				pVector.PushBack(new Child());
+				Assert::Plz(pObjectA.GetNumSpawn() == 2);
+				Child pSpawnB = cast Child(pVector.Get(1));
+				pSpawnB.__pUint32Vector.Set(0, 33);
+				Assert::Plz(pSpawnB.GetChildId() == 33);
+				pSpawnB.__pStringVector.Set(0, new InternalString("banana"));
+				Assert::Plz(ExternalString::Equal(pSpawnB.GetName(), "banana"));
 
-				Assert::Plz(ExternalString::Equal(pChild.GetName(), ""));
-				pChild.__pStringVector.Set(0, new InternalString("banana"));
-				Assert::Plz(ExternalString::Equal(pChild.GetName(), "banana"));
+				Assert::Plz(pObjectA.GetSpawnByIndex(0) == pSpawnA);
+				Assert::Plz(pObjectA.GetSpawnByChildId(2222) == pSpawnA);
+				Assert::Plz(pObjectA.GetSpawnByChildId(33) == pSpawnB);
+				Assert::Plz(pObjectA.GetSpawnByChildId(69) == null);
+				Assert::Plz(pObjectA.GetSpawnByName("") == pSpawnA);
+				Assert::Plz(pObjectA.GetSpawnByName("banana") == pSpawnB);
+				Assert::Plz(pObjectA.GetSpawnByName("404") == null);
 
 				gsBlob* pBlob = own new gsBlob();
 				pObjectA.Pack(pBlob);
@@ -159,9 +151,6 @@ namespace NumbatLogic
 				Parent* pObjectC = own new Parent();
 				Assert::Plz(!pObjectC.Unpack(pBlob));
 				Assert::Plz(!pObjectC.IsEqual(pObjectA));
-
-				//vector test!
-				//vector pack?
 			}
 		}
 	}

@@ -19,12 +19,14 @@
 		public bool $m_bVector;
 		public int $m_nDataIndex;
 
-		function __construct(string $sType, string $sName, bool $bVector)
+		function __construct(string $sType, string $sName)
 		{
 			$this->m_sType = $sType;
 			$this->m_sName = $sName;
-			$this->m_bVector = $bVector;
+			$this->m_bVector = false;
 			$this->m_nDataIndex = 0;
+
+			
 		}
 
 		function GetMemberType()
@@ -67,7 +69,9 @@
 				return $this->m_sType;
 			if ($this->IsString())
 				return "String";
-			return "Object"; // todo vector
+			if ($this->m_bVector)
+				return "Vector";
+			return "Object";
 		}
 
 		function GetFieldInfoType()
@@ -77,7 +81,22 @@
 				case "Uint32": return "NetObject::FieldInfo::Type::UINT32";
 				case "string": return "NetObject::FieldInfo::Type::STRING";
 			}
+			if ($this->m_bVector)
+				return "NetObject::FieldInfo::Type::VECTOR";
 			return "NetObject::FieldInfo::Type::OBJECT";
+		}
+	}
+
+	class NetObjectVectorField extends NetObjectField
+	{
+		public array $m_sLookupFieldArray;
+		function __construct(string $sType, string $sName, array $sLookupFieldArray)
+		{
+			parent::__construct($sType, $sName);
+			$this->m_sLookupFieldArray = $sLookupFieldArray;
+			$this->m_bVector = true;
+			if (!$this->IsCustomType())
+				throw new Error("vectors must be custom types");
 		}
 	}
 
@@ -106,7 +125,7 @@
 			}
 		}
 
-		public function Output()
+		public function Output(array $pObjectArray)
 		{
 			if (sizeof($this->m_pFieldArray) == 0)
 			{
@@ -150,7 +169,7 @@
 							{
 								$pField = $this->m_pFieldArray[$j];
 								if ($pField->IsCustomType())
-									Output("\t\t\t\tcase " . $j . ": return new " . $pField->m_sName . "();\n");
+									Output("\t\t\t\tcase " . $j . ": return new " . $pField->m_sType . "();\n");
 							}
 						Output("\t\t\t}\n");
 						Output("\t\t\tAssert::Plz(false);\n");
@@ -167,12 +186,66 @@
 				for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
 				{
 					$pField = $this->m_pFieldArray[$j];
-					Output("\t\tpublic " . $pField->m_sType . " Get" . $pField->m_sName . "() { ");
-					if ($pField->IsCustomType())
-						Output("return cast " . $pField->m_sType . "(Get" . $pField->GetDataType() . "(" . $pField->m_nDataIndex . "));");
+
+					if ($pField->m_bVector)
+					{
+						$pVectorObject = null;
+						for ($k = 0; $k < sizeof($pObjectArray); $k++)
+						{
+							if ($pObjectArray[$k]->m_sName == $pField->m_sType)
+							{
+								$pVectorObject = $pObjectArray[$k];
+								break;
+							}
+						}
+
+						if ($pVectorObject == null)
+							throw new Error("Unable to find type for vector object " . $pField->m_sType);
+
+
+						Output("\t\tpublic int GetNum" . $pField->m_sName . "() { return __GetVectorSize(" . $pField->m_nDataIndex . "); }\n");
+						Output("\t\tpublic " . $pField->m_sType . " Get" . $pField->m_sName . "ByIndex(int nIndex) { return cast " . $pField->m_sType . "(__GetVectorObject(" . $pField->m_nDataIndex . ", nIndex)); }\n");
+
+						// add custom lookup fields
+						if (sizeof($pField->m_sLookupFieldArray) > 0)
+						{
+							for ($k = 0; $k < sizeof($pField->m_sLookupFieldArray); $k++)
+							{
+								$sLookupField = $pField->m_sLookupFieldArray[$k];
+
+								$pVectorObjectField = null;
+								for ($l = 0; $l < sizeof($pVectorObject->m_pFieldArray); $l++)
+								{
+									if ($pVectorObject->m_pFieldArray[$l]->m_sName == $sLookupField)
+									{
+										$pVectorObjectField = $pVectorObject->m_pFieldArray[$l];
+										break;
+									}
+								}
+
+								if ($pVectorObjectField == null)
+									throw new Error("Unable to find lookup field " . $sLookupField);
+
+								if ($pVectorObjectField->IsCustomType())
+									throw new Error("Cannot lookup by a field with a custom type " . $sLookupField . " " . $pVectorObjectField->m_sType);
+
+								$sParamName = GetPrefix($pVectorObjectField->m_sType) . $pVectorObjectField->m_sName;
+								
+								Output("\t\tpublic " . $pField->m_sType . " Get" . $pField->m_sName . "By" . $pVectorObjectField->m_sName);
+									Output("(" . $pVectorObjectField->m_sType . " " . $sParamName . ") { return cast " . $pField->m_sType . "(");
+									Output("__GetVectorObjectBy" . $pVectorObjectField->GetDataType() . "(" . $pField->m_nDataIndex . ", " . $pVectorObjectField->m_nDataIndex . ", " . $sParamName . ")); }\n");
+							}
+						}
+					}
 					else
-						Output("return Get" . $pField->GetDataType() . "(" . $pField->m_nDataIndex . ");");
-					Output(" }\n");
+					{
+						Output("\t\tpublic " . $pField->m_sType . " Get" . $pField->m_sName . "() { ");
+						if ($pField->IsCustomType())
+							Output("return cast " . $pField->m_sType . "(__Get" . $pField->GetDataType() . "(" . $pField->m_nDataIndex . "));");
+						else
+							Output("return __Get" . $pField->GetDataType() . "(" . $pField->m_nDataIndex . ");");
+						Output(" }\n");
+					}
 				}
 			Output("\t}\n");
 		}
@@ -191,7 +264,7 @@
 			$this->m_pFieldArray = $pFieldArray;
 		}
 
-		public function Output()
+		public function Output(array $pObjectArray)
 		{
 			Output("\tclass " . $this->m_sName . " : NetObject::Filter\n");
 			Output("\t{\n");
@@ -216,7 +289,7 @@
 				Output("\n");
 
 			$pObject = $pObjectArray[$i];
-			$pObject->Output();
+			$pObject->Output($pObjectArray);
 		}
 
 		Output("\n");
