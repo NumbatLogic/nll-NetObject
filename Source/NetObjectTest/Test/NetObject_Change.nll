@@ -17,7 +17,7 @@ namespace NumbatLogic
 
 			NetObject_Output($pOutputArray);
 		?>*/
-			class TestObjectInfo : NetObject::Info
+			class TestObjectInfo : NetObject::ObjectInfo
 			{
 				public static TestObjectInfo __pStatic = null;
 				public construct() : base(2, 0, 0, 0)

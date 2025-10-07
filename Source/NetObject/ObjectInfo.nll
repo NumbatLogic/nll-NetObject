@@ -2,7 +2,7 @@ namespace NumbatLogic
 {
 	namespace NetObject
 	{
-		class Info
+		class ObjectInfo
 		{
 			public int __nNumUint32;
 			public int __nNumString;

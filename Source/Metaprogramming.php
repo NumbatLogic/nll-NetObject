@@ -133,7 +133,7 @@
 				return;
 			}
 
-			Output("\tclass " . $this->m_sName . "Info : NetObject::Info\n");
+			Output("\tclass " . $this->m_sName . "Info : NetObject::ObjectInfo\n");
 			Output("\t{\n");
 				Output("\t\tpublic static " . $this->m_sName . "Info __pStatic = null;\n");
 				Output("\t\tpublic construct() : base(");

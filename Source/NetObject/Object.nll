@@ -4,7 +4,7 @@ namespace NumbatLogic
 	{
 		class Object
 		{
-			public Info __pInfo;
+			public ObjectInfo __pInfo;
 			public Filter __pFilter;
 
 			// todo: NLL needs fixed array tech...
@@ -13,7 +13,7 @@ namespace NumbatLogic
 			public OwnedVector<Object>* __pObjectVector;
 			public OwnedVector<OwnedVector<Object>!>* __pVectorVector;
 
-			public construct(Info pInfo, Filter pFilter)
+			public construct(ObjectInfo pInfo, Filter pFilter)
 			{
 				__pInfo = pInfo;
 				__pFilter = pFilter;

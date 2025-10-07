@@ -25,7 +25,7 @@ namespace NumbatLogic
 
 			NetObject_Output($pOutputArray);
 		?>*/
-			class ChildInfo : NetObject::Info
+			class ChildInfo : NetObject::ObjectInfo
 			{
 				public static ChildInfo __pStatic = null;
 				public construct() : base(1, 1, 0, 0)
@@ -46,7 +46,7 @@ namespace NumbatLogic
 				public string GetName() { return __GetString(0, 1); }
 			}
 
-			class ParentInfo : NetObject::Info
+			class ParentInfo : NetObject::ObjectInfo
 			{
 				public static ParentInfo __pStatic = null;
 				public construct() : base(1, 0, 0, 1)
