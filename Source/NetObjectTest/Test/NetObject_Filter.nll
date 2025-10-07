@@ -114,11 +114,13 @@ namespace NumbatLogic
 
 			class NetObjectStatic
 			{
+				public NetObject::ChangeMap* __pChangeMap;
 				public ChildInfo* m_pChildInfo;
 				public ParentInfo* m_pParentInfo;
 				public ParentFilter* m_pParentFilter;
 				public construct()
 				{
+					__pChangeMap = own new NetObject::ChangeMap();
 					m_pChildInfo = own new ChildInfo();
 					m_pParentInfo = own new ParentInfo();
 					m_pParentFilter = own new ParentFilter();

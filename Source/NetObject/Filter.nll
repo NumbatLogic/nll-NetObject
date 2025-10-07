@@ -1,0 +1,34 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class Filter
+		{
+			public Vector<bool>* __bExposeFieldVector;
+			public OwnedVector<Filter>* __pFieldFilterVector;
+
+			public construct(int nNumField)
+			{
+				__bExposeFieldVector = own new Vector<bool>();
+				__pFieldFilterVector = own new OwnedVector<Filter>();
+				for (int i = 0; i < nNumField; i++)
+				{
+					__bExposeFieldVector.PushBack(false);
+					__pFieldFilterVector.PushBack(null);
+				}
+			}
+
+			public void __ExposeField(int nIndex)
+			{
+				__bExposeFieldVector.Set(nIndex, true);
+			}
+
+			public Filter __ExposeFieldCreateFilter(int nIndex, int nNumFieldField)
+			{
+				__bExposeFieldVector.Set(nIndex, true);
+				__pFieldFilterVector.Set(nIndex, new Filter(nNumFieldField));
+				return __pFieldFilterVector.Get(nIndex);
+			}
+		}
+	}
+}

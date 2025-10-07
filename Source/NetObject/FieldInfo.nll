@@ -1,0 +1,28 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class FieldInfo
+		{
+			public enum Type {
+				UINT32,
+				STRING,
+				OBJECT,
+				VECTOR
+			}
+
+			// todo some checksums
+
+			public Type __eType;
+			public InternalString* __sName;
+			public int __nDataIndex;
+
+			public construct(Type eType, string sxName, int nDataIndex)
+			{
+				__eType = eType;
+				__sName = own new InternalString(sxName);
+				__nDataIndex = nDataIndex;
+			}
+		}
+	}
+}

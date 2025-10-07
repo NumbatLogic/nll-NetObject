@@ -1,0 +1,58 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class ChangeAddUint32 : Change
+		{
+			public static const Uint32 HASH = ExternalString::GetChecksum("ChangeAddUint32");
+
+			public Uint8 __nDataIndex;
+			public InternalString* __sFieldName;
+			public Uint32 __nValue;
+
+			private construct() : base(HASH) {}
+			public construct(Uint8 nDataIndex, Uint32 nValue) : base(HASH)
+			{
+				__nDataIndex = nDataIndex;
+				__nValue = nValue;
+			}
+
+			public construct(string sxFieldName, Uint32 nValue) : base(HASH)
+			{
+				__sFieldName = own new InternalString(sxFieldName);
+				__nValue = nValue;
+			}
+
+			public override bool Apply(Object pObject)
+			{
+				if (__sFieldName != null)
+				{
+					FieldInfo pFieldInfo = pObject.__pInfo.GetFieldInfoByNameAndType(__sFieldName.GetExternalString(), FieldInfo::Type::UINT32);
+					if (!pFieldInfo)
+						return false;
+					__nDataIndex = pFieldInfo.__nDataIndex;
+				}
+
+				pObject.__pUint32Vector.Set(__nDataIndex, pObject.__pUint32Vector.Get(__nDataIndex) + __nValue);
+				return true;
+			}
+
+			public void Pack(gsBlob pBlob)
+			{
+				base.Pack(pBlob);
+				pBlob.PackUint8(__nDataIndex);
+				pBlob.PackUint32(__nValue);
+			}
+
+			public static Change** CreateAndUnpack(gsBlob pBlob)
+			{
+				ChangeAddUint32* pChange = own new ChangeAddUint32();
+				if (!pBlob.UnpackUint8(pChange.__nDataIndex) || !pBlob.UnpackUint32(pChange.__nValue))
+					return null;
+				return pChange;
+			}
+
+
+		}
+	}
+}

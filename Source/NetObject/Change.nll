@@ -1,0 +1,99 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class CreateCallbackInfo
+		{
+			public delegate Change** Callback(gsBlob pBlob);
+
+			public Int32 __nHash;
+			public Callback __pCallback;
+
+			public construct(Int32 nHash, Callback pCallback)
+			{
+				__nHash = nHash;
+				__pCallback = pCallback;
+			}
+		}
+
+		class ChangeMap
+		{
+			public static OwnedVector<CreateCallbackInfo>* __pCallbackInfoVector;
+			
+			public construct()
+			{
+				Assert::Plz(__pCallbackInfoVector == null);
+				__pCallbackInfoVector = own new OwnedVector<CreateCallbackInfo>();
+
+				Register(ChangeAddUint32::HASH, ChangeAddUint32::CreateAndUnpack);
+			}
+			
+			public static void Register(Int32 nHash, CreateCallbackInfo::Callback pCallback)
+			{
+				Assert::Plz(__pCallbackInfoVector != null);
+
+				if (__Find(nHash) != null)
+				{
+					Console::Log("Callback hash already registered!");
+					Assert::Plz(false);
+				}
+
+				__pCallbackInfoVector.PushBack(new CreateCallbackInfo(nHash, pCallback));
+			}
+
+			public static CreateCallbackInfo __Find(Int32 nHash)
+			{
+				for (int i = 0; i < __pCallbackInfoVector.GetSize(); i++)
+				{
+					CreateCallbackInfo pCallbackInfo = __pCallbackInfoVector.Get(i);
+					if (pCallbackInfo.__nHash == nHash)
+						return pCallbackInfo;
+				}
+				return null;
+			}
+
+			public static Change** CreateChange(Int32 nHash, gsBlob pBlob)
+			{
+				CreateCallbackInfo pCallbackInfo = __Find(nHash);
+				if (!pCallbackInfo)
+					return null;
+				return pCallbackInfo.__pCallback(pBlob);
+			}
+		}
+
+		class Change
+		{
+			public Int32 __nHash;
+
+			public construct(Int32 nHash)
+			{
+				__nHash = nHash;
+			}
+
+			public void Pack(gsBlob pBlob)
+			{
+				pBlob.PackInt32(__nHash);
+			}
+
+			public virtual bool Apply(Object pObject)
+			{
+				Assert::Plz(false);
+				return false;
+			}
+
+			/*public static Change** Unpack(gsBlob pBlob)
+			{
+				Int32 nHash;
+				if (!pBlob.UnpackInt32(nHash))
+					return null;
+
+				Change* pChange;
+
+
+				return null;
+			}*/
+
+			
+		}
+	}
+}

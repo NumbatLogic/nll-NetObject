@@ -1,0 +1,73 @@
+namespace NumbatLogic
+{
+	namespace NetObject_Change
+	{
+		/*<?
+			include_once "../../Metaprogramming.php";
+
+			$pOutputArray = array();
+
+			$pTestObject = new NetObject("TestObject",
+				[
+					new NetObjectField("Uint32", "TestId"),
+					new NetObjectField("Uint32", "Gold"),
+				]
+			);
+			$pOutputArray[] = $pTestObject;
+
+			NetObject_Output($pOutputArray);
+		?>*/
+			class TestObjectInfo : NetObject::Info
+			{
+				public static TestObjectInfo __pStatic = null;
+				public construct() : base(2, 0, 0, 0)
+				{
+					Assert::Plz(__pStatic == null);
+					__pStatic = this;
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "TestId", 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "Gold", 1));
+				}
+				public destruct() { __pStatic = null; }
+				public static TestObjectInfo GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }
+			}
+
+			class TestObject : NetObject::Object
+			{
+				public construct(NetObject::Filter pFilter = null) : base(TestObjectInfo::GetStatic(), pFilter) { }
+				public Uint32 GetTestId() { return __GetUint32(0, 0); }
+				public Uint32 GetGold() { return __GetUint32(1, 1); }
+			}
+
+			class NetObjectStatic
+			{
+				public NetObject::ChangeMap* __pChangeMap;
+				public TestObjectInfo* m_pTestObjectInfo;
+				public construct()
+				{
+					__pChangeMap = own new NetObject::ChangeMap();
+					m_pTestObjectInfo = own new TestObjectInfo();
+				}
+			}
+		/*<??>*/
+		
+		class Test
+		{
+			public static void Run()
+			{
+				NetObjectStatic* pStaticInfo = own new NetObjectStatic();
+				TestObject* pTestObject = own new TestObject();
+				{
+					Assert::Plz(pTestObject.GetGold() == 0);
+					NetObject::ChangeAddUint32* pChange = own new NetObject::ChangeAddUint32(1, 1337);
+					Assert::Plz(pChange.Apply(pTestObject));
+					Assert::Plz(pTestObject.GetGold() == 1337);
+				}
+				{
+					NetObject::ChangeAddUint32* pChange = own new NetObject::ChangeAddUint32("Gold", 1);
+					Assert::Plz(pChange.Apply(pTestObject));
+					Assert::Plz(pTestObject.GetGold() == 1338);
+				}
+			}
+		}
+	}
+} 

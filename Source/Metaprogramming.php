@@ -354,6 +354,7 @@
 		Output("\n");
 		Output("\tclass " . $sContainerName . "\n");
 		Output("\t{\n");
+			Output("\t\tpublic NetObject::ChangeMap* __pChangeMap;\n");
 			for ($i = 0; $i < sizeof($pObjectArray); $i++)
 			{
 				if ($i > 0)
@@ -369,6 +370,7 @@
 			Output("\n");
 			Output("\t\tpublic construct()\n");
 			Output("\t\t{\n");
+			Output("\t\t\t__pChangeMap = own new NetObject::ChangeMap();\n");
 			for ($i = 0; $i < sizeof($pObjectArray); $i++)
 			{
 				$pObject = $pObjectArray[$i];

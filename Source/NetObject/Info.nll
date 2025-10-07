@@ -1,0 +1,48 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class Info
+		{
+			public int __nNumUint32;
+			public int __nNumString;
+			public int __nNumObject;
+			public int __nNumVector;
+			public OwnedVector<FieldInfo>* __pFieldInfoVector;
+
+			public construct(int nNumUint32, int nNumString, int nNumObject, int nNumVector)
+			{
+				__nNumUint32 = nNumUint32;
+				__nNumString = nNumString;
+				__nNumObject = nNumObject;
+				__nNumVector = nNumVector;
+				__pFieldInfoVector = own new OwnedVector<FieldInfo>();
+			}
+
+			public FieldInfo GetFieldInfoByName(string sxName)
+			{
+				for (int i = 0; i < __pFieldInfoVector.GetSize(); i++)
+				{
+					FieldInfo pFieldInfo = __pFieldInfoVector.Get(i);
+					if (pFieldInfo.__sName.IsEqual(sxName))
+						return pFieldInfo;
+				}
+				return null;
+			}
+
+			public FieldInfo GetFieldInfoByNameAndType(string sxName, FieldInfo::Type eType)
+			{
+				FieldInfo pFieldInfo = GetFieldInfoByName(sxName);
+				if (pFieldInfo && pFieldInfo.__eType == eType)
+					return pFieldInfo;
+				return null;
+			}
+
+			public virtual Object** __CreateChildObject(int nFieldIndex, Filter pFilter)
+			{
+				Assert::Plz(false);
+				return null;
+			}
+		}
+	}
+}
