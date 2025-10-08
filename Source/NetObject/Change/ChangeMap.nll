@@ -1,0 +1,58 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class ChangeCreateCallbackInfo
+		{
+			public delegate Change** Callback();
+
+			public Uint32 __nHash;
+			public Callback __pCallback;
+
+			public construct(Uint32 nHash, Callback pCallback)
+			{
+				__nHash = nHash;
+				__pCallback = pCallback;
+			}
+		}
+		
+		class ChangeMap
+		{
+			public static OwnedVector<ChangeCreateCallbackInfo>* __pCallbackInfoVector;
+			
+			public construct()
+			{
+				Assert::Plz(__pCallbackInfoVector == null);
+				__pCallbackInfoVector = own new OwnedVector<ChangeCreateCallbackInfo>();
+
+				Register(ChangeUint32Add::HASH, ChangeUint32Add::__Create);
+				Register(ChangeUint32Set::HASH, ChangeUint32Set::__Create);
+				Register(ChangeUint32Subtract::HASH, ChangeUint32Subtract::__Create);
+			}
+			
+			public static void Register(Uint32 nHash, ChangeCreateCallbackInfo::Callback pCallback)
+			{
+				Assert::Plz(__pCallbackInfoVector != null);
+
+				if (__Find(nHash) != null)
+				{
+					Console::Log("Callback hash already registered!");
+					Assert::Plz(false);
+				}
+
+				__pCallbackInfoVector.PushBack(new ChangeCreateCallbackInfo(nHash, pCallback));
+			}
+
+			public static ChangeCreateCallbackInfo __Find(Uint32 nHash)
+			{
+				for (int i = 0; i < __pCallbackInfoVector.GetSize(); i++)
+				{
+					ChangeCreateCallbackInfo pCallbackInfo = __pCallbackInfoVector.Get(i);
+					if (pCallbackInfo.__nHash == nHash)
+						return pCallbackInfo;
+				}
+				return null;
+			}
+		}
+	}
+}
