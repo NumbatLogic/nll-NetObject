@@ -1,0 +1,46 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class ChangeField : Change
+		{
+			public Uint8 __nDataIndex;
+			public InternalString* __sFieldName;
+			public FieldInfo::Type __eType;
+			
+			private construct(Uint32 nHash) : base(nHash) {}
+			public construct(Uint32 nHash, FieldInfo::Type eType, string sxFieldName) : base(nHash)
+			{
+				__eType = eType;
+				__sFieldName = own new InternalString(sxFieldName);
+			}
+
+			public override bool Apply(Object pObject)
+			{
+				if (__sFieldName != null)
+				{
+					FieldInfo pFieldInfo = pObject.__pInfo.GetFieldInfoByNameAndType(__sFieldName.GetExternalString(), FieldInfo::Type::UINT32);
+					if (!pFieldInfo)
+						return false;
+					__nDataIndex = pFieldInfo.__nDataIndex;
+				}
+				return true;
+			}
+
+			public override void Pack(gsBlob pBlob)
+			{
+				base.Pack(pBlob);
+				pBlob.PackUint8(__nDataIndex);
+			}
+
+			public override bool Unpack(gsBlob pBlob)
+			{
+				if (!base.Unpack(pBlob))
+					return false;
+				if (!pBlob.UnpackUint8(__nDataIndex))
+					return false;
+				return true;
+			}
+		}
+	}
+}

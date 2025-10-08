@@ -52,21 +52,24 @@ namespace NumbatLogic
 		
 		class Test
 		{
+			public static void ApplyPackUnpackApplyEquals(NetObject::Object pObjectA, NetObject::Object pObjectB, NetObject::Change pChange)
+			{
+				Assert::Plz(pChange.Apply(pObjectA));
+				
+				gsBlob* pBlob = own new gsBlob();
+				pChange.Pack(pBlob);
+				pBlob.SetOffset(0);
+
+				NetObject::Change* pChangeB = own NetObject::Change::CreateAndUnpack(pBlob);
+				Assert::Plz(pChangeB != null);
+				Assert::Plz(pChangeB.Apply(pObjectB));
+				
+				Assert::Plz(pObjectA.IsEqual(pObjectB));
+			}
+
 			public static void Run()
 			{
-				NetObjectStatic* pStaticInfo = own new NetObjectStatic();
-				TestObject* pTestObject = own new TestObject();
-				{
-					Assert::Plz(pTestObject.GetGold() == 0);
-					NetObject::ChangeAddUint32* pChange = own new NetObject::ChangeAddUint32(1, 1337);
-					Assert::Plz(pChange.Apply(pTestObject));
-					Assert::Plz(pTestObject.GetGold() == 1337);
-				}
-				{
-					NetObject::ChangeAddUint32* pChange = own new NetObject::ChangeAddUint32("Gold", 1);
-					Assert::Plz(pChange.Apply(pTestObject));
-					Assert::Plz(pTestObject.GetGold() == 1338);
-				}
+				// i'm just reusable stuff for the other change tests!
 			}
 		}
 	}

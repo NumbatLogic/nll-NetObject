@@ -4,12 +4,12 @@ namespace NumbatLogic
 	{
 		class CreateCallbackInfo
 		{
-			public delegate Change** Callback(gsBlob pBlob);
+			public delegate Change** Callback();
 
-			public Int32 __nHash;
+			public Uint32 __nHash;
 			public Callback __pCallback;
 
-			public construct(Int32 nHash, Callback pCallback)
+			public construct(Uint32 nHash, Callback pCallback)
 			{
 				__nHash = nHash;
 				__pCallback = pCallback;
@@ -25,10 +25,12 @@ namespace NumbatLogic
 				Assert::Plz(__pCallbackInfoVector == null);
 				__pCallbackInfoVector = own new OwnedVector<CreateCallbackInfo>();
 
-				Register(ChangeAddUint32::HASH, ChangeAddUint32::CreateAndUnpack);
+				Register(ChangeUint32Add::HASH, ChangeUint32Add::__Create);
+				Register(ChangeUint32Set::HASH, ChangeUint32Set::__Create);
+				Register(ChangeUint32Subtract::HASH, ChangeUint32Subtract::__Create);
 			}
 			
-			public static void Register(Int32 nHash, CreateCallbackInfo::Callback pCallback)
+			public static void Register(Uint32 nHash, CreateCallbackInfo::Callback pCallback)
 			{
 				Assert::Plz(__pCallbackInfoVector != null);
 
@@ -41,7 +43,7 @@ namespace NumbatLogic
 				__pCallbackInfoVector.PushBack(new CreateCallbackInfo(nHash, pCallback));
 			}
 
-			public static CreateCallbackInfo __Find(Int32 nHash)
+			public static CreateCallbackInfo __Find(Uint32 nHash)
 			{
 				for (int i = 0; i < __pCallbackInfoVector.GetSize(); i++)
 				{
@@ -51,28 +53,15 @@ namespace NumbatLogic
 				}
 				return null;
 			}
-
-			public static Change** CreateChange(Int32 nHash, gsBlob pBlob)
-			{
-				CreateCallbackInfo pCallbackInfo = __Find(nHash);
-				if (!pCallbackInfo)
-					return null;
-				return pCallbackInfo.__pCallback(pBlob);
-			}
 		}
 
 		class Change
 		{
-			public Int32 __nHash;
+			public Uint32 __nHash;
 
-			public construct(Int32 nHash)
+			public construct(Uint32 nHash)
 			{
 				__nHash = nHash;
-			}
-
-			public void Pack(gsBlob pBlob)
-			{
-				pBlob.PackInt32(__nHash);
 			}
 
 			public virtual bool Apply(Object pObject)
@@ -81,19 +70,32 @@ namespace NumbatLogic
 				return false;
 			}
 
-			/*public static Change** Unpack(gsBlob pBlob)
+			public virtual void Pack(gsBlob pBlob)
 			{
-				Int32 nHash;
-				if (!pBlob.UnpackInt32(nHash))
+				pBlob.PackUint32(__nHash);
+			}
+
+			public virtual bool Unpack(gsBlob pBlob)
+			{
+				return true;
+			}
+			
+			public static Change** CreateAndUnpack(gsBlob pBlob)
+			{
+				Uint32 nHash;
+				if (!pBlob.UnpackUint32(nHash))
+					return null;
+				
+				CreateCallbackInfo pCallbackInfo = ChangeMap::__Find(nHash);
+				if (!pCallbackInfo)
 					return null;
 
-				Change* pChange;
+				Change* pChange = own pCallbackInfo.__pCallback();
+				if (pChange == null || !pChange.Unpack(pBlob))
+					return null;
 
-
-				return null;
-			}*/
-
-			
+				return disown pChange;
+			}
 		}
 	}
 }
