@@ -321,6 +321,20 @@ namespace NumbatLogic
 				return sTemp.GetExternalString();
 			}
 
+			public void __SetString(int nDataIndex, string sxString)
+			{
+				Console::Log(sxString);
+				//Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
+				InternalString sTemp = __pStringVector.Get(nDataIndex);
+				if (sTemp == null)
+				{
+					InternalString* sOwned = own new InternalString(sxString);
+					__pStringVector.Set(nDataIndex, disown sOwned);
+					return;
+				}
+				sTemp.Set(sxString);
+			}
+
 			public Object __GetObject(int nIndex, int nFieldIndex)
 			{
 				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));

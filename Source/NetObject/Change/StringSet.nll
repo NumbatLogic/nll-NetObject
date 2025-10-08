@@ -1,0 +1,47 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class StringSet : ChangeField
+		{
+			public static const Uint32 HASH = ExternalString::GetChecksum("StringSet");
+			public static Change** __Create() { return new StringSet(); }
+			private construct() : base(HASH) { }
+			
+			public InternalString* __sValue;
+
+			public construct(string sxFieldName, string sxValue) : base(HASH, FieldInfo::Type::STRING, sxFieldName)
+			{
+				__sValue = own new InternalString(sxValue);
+			}
+
+			public override bool Apply(Object pObject)
+			{
+				if (!base.Apply(pObject))
+					return false;
+				
+				pObject.__SetString(__nDataIndex, __sValue.GetExternalString());
+				return true;
+			}
+
+			public override void Pack(gsBlob pBlob)
+			{
+				base.Pack(pBlob);
+				pBlob.PackInternalString(__sValue);
+			}
+
+			public override bool Unpack(gsBlob pBlob)
+			{
+				if (!base.Unpack(pBlob))
+					return false;
+
+				if (__sValue == null)
+					__sValue = own new InternalString("");
+		
+				if (!pBlob.UnpackInternalString(__sValue))
+					return false;
+				return true;
+			}
+		}
+	}
+}

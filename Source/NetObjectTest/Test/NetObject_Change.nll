@@ -10,6 +10,7 @@ namespace NumbatLogic
 			$pTestObject = new NetObject("TestObject",
 				[
 					new NetObjectField("Uint32", "TestId"),
+					new NetObjectField("string", "Name"),
 					new NetObjectField("Uint32", "Gold"),
 				]
 			);
@@ -20,11 +21,12 @@ namespace NumbatLogic
 			class TestObjectInfo : NetObject::ObjectInfo
 			{
 				public static TestObjectInfo __pStatic = null;
-				public construct() : base(2, 0, 0, 0)
+				public construct() : base(2, 1, 0, 0)
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;
 					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "TestId", 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::STRING, "Name", 0));
 					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "Gold", 1));
 				}
 				public destruct() { __pStatic = null; }
@@ -35,7 +37,8 @@ namespace NumbatLogic
 			{
 				public construct(NetObject::Filter pFilter = null) : base(TestObjectInfo::GetStatic(), pFilter) { }
 				public Uint32 GetTestId() { return __GetUint32(0, 0); }
-				public Uint32 GetGold() { return __GetUint32(1, 1); }
+				public string GetName() { return __GetString(0, 1); }
+				public Uint32 GetGold() { return __GetUint32(1, 2); }
 			}
 
 			class NetObjectStatic
