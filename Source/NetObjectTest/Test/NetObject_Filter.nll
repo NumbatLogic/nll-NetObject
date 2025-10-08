@@ -43,8 +43,8 @@ namespace NumbatLogic
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ChildId", 0));
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::STRING, "Name", 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ChildId", 0, 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::STRING, "Name", 1, 0));
 				}
 				public destruct() { __pStatic = null; }
 				public static ChildInfo GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }
@@ -54,7 +54,7 @@ namespace NumbatLogic
 			{
 				public construct(NetObject::Filter pFilter = null) : base(ChildInfo::GetStatic(), pFilter) { }
 				public Uint32 GetChildId() { return __GetUint32(0, 0); }
-				public string GetName() { return __GetString(0, 1); }
+				public string GetName() { return __GetString(1, 0); }
 			}
 
 			class ParentInfo : NetObject::ObjectInfo
@@ -64,10 +64,10 @@ namespace NumbatLogic
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ParentId", 0));
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::OBJECT, "Child", 0));
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::VECTOR, "Spawn", 0));
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "Sekrit", 1));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ParentId", 0, 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::OBJECT, "Child", 1, 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::VECTOR, "Spawn", 2, 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "Sekrit", 3, 1));
 				}
 				public destruct() { __pStatic = null; }
 				public static ParentInfo GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }
@@ -87,11 +87,11 @@ namespace NumbatLogic
 			{
 				public construct(NetObject::Filter pFilter = null) : base(ParentInfo::GetStatic(), pFilter) { }
 				public Uint32 GetParentId() { return __GetUint32(0, 0); }
-				public Child GetChild() { return cast Child(__GetObject(0, 1)); }
-				public int GetNumSpawn() { return __GetVectorSize(0); }
-				public Child GetSpawnByIndex(int nIndex) { return cast Child(__GetVectorObject(0, nIndex)); }
-				public Child GetSpawnByChildId(Uint32 nChildId) { return cast Child(__GetVectorObjectByUint32(0, 0, nChildId)); }
-				public Uint32 GetSekrit() { return __GetUint32(1, 3); }
+				public Child GetChild() { return cast Child(__GetObject(1, 0)); }
+				public int GetNumSpawn() { return __GetVectorSize(2, 0); }
+				public Child GetSpawnByIndex(int nIndex) { return cast Child(__GetVectorObject(2, 0, nIndex)); }
+				public Child GetSpawnByChildId(Uint32 nChildId) { return cast Child(__GetVectorObjectByUint32(2, 0, 0, nChildId)); }
+				public Uint32 GetSekrit() { return __GetUint32(3, 1); }
 			}
 
 			class ParentFilter : NetObject::Filter

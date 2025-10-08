@@ -32,8 +32,8 @@ namespace NumbatLogic
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ChildId", 0));
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::STRING, "Name", 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ChildId", 0, 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::STRING, "Name", 1, 0));
 				}
 				public destruct() { __pStatic = null; }
 				public static ChildInfo GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }
@@ -43,7 +43,7 @@ namespace NumbatLogic
 			{
 				public construct(NetObject::Filter pFilter = null) : base(ChildInfo::GetStatic(), pFilter) { }
 				public Uint32 GetChildId() { return __GetUint32(0, 0); }
-				public string GetName() { return __GetString(0, 1); }
+				public string GetName() { return __GetString(1, 0); }
 			}
 
 			class ParentInfo : NetObject::ObjectInfo
@@ -53,8 +53,8 @@ namespace NumbatLogic
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ParentId", 0));
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::VECTOR, "Spawn", 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ParentId", 0, 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::VECTOR, "Spawn", 1, 0));
 				}
 				public destruct() { __pStatic = null; }
 				public static ParentInfo GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }
@@ -73,10 +73,10 @@ namespace NumbatLogic
 			{
 				public construct(NetObject::Filter pFilter = null) : base(ParentInfo::GetStatic(), pFilter) { }
 				public Uint32 GetParentId() { return __GetUint32(0, 0); }
-				public int GetNumSpawn() { return __GetVectorSize(0); }
-				public Child GetSpawnByIndex(int nIndex) { return cast Child(__GetVectorObject(0, nIndex)); }
-				public Child GetSpawnByChildId(Uint32 nChildId) { return cast Child(__GetVectorObjectByUint32(0, 0, nChildId)); }
-				public Child GetSpawnByName(string sName) { return cast Child(__GetVectorObjectByString(0, 0, sName)); }
+				public int GetNumSpawn() { return __GetVectorSize(1, 0); }
+				public Child GetSpawnByIndex(int nIndex) { return cast Child(__GetVectorObject(1, 0, nIndex)); }
+				public Child GetSpawnByChildId(Uint32 nChildId) { return cast Child(__GetVectorObjectByUint32(1, 0, 0, nChildId)); }
+				public Child GetSpawnByName(string sName) { return cast Child(__GetVectorObjectByString(1, 0, 0, sName)); }
 			}
 
 			class NetObjectStatic

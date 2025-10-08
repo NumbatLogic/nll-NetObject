@@ -15,12 +15,14 @@ namespace NumbatLogic
 
 			public Type __eType;
 			public InternalString* __sName;
-			public int __nDataIndex;
+			public Uint8 __nFieldIndex;
+			public Uint8 __nDataIndex;
 
-			public construct(Type eType, string sxName, int nDataIndex)
+			public construct(Type eType, string sxName, Uint8 nFieldIndex, Uint8 nDataIndex)
 			{
 				__eType = eType;
 				__sName = own new InternalString(sxName);
+				__nFieldIndex = nFieldIndex;
 				__nDataIndex = nDataIndex;
 			}
 		}

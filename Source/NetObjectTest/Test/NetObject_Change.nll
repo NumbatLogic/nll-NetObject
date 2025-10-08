@@ -25,9 +25,9 @@ namespace NumbatLogic
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "TestId", 0));
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::STRING, "Name", 0));
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "Gold", 1));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "TestId", 0, 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::STRING, "Name", 1, 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "Gold", 2, 1));
 				}
 				public destruct() { __pStatic = null; }
 				public static TestObjectInfo GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }
@@ -37,8 +37,8 @@ namespace NumbatLogic
 			{
 				public construct(NetObject::Filter pFilter = null) : base(TestObjectInfo::GetStatic(), pFilter) { }
 				public Uint32 GetTestId() { return __GetUint32(0, 0); }
-				public string GetName() { return __GetString(0, 1); }
-				public Uint32 GetGold() { return __GetUint32(1, 2); }
+				public string GetName() { return __GetString(1, 0); }
+				public Uint32 GetGold() { return __GetUint32(2, 1); }
 			}
 
 			class NetObjectStatic

@@ -4,8 +4,8 @@ namespace NumbatLogic
 	{
 		class ChangeField : Change
 		{
-			public Uint8 __nDataIndex;
 			public Uint8 __nFieldIndex;
+			public Uint8 __nDataIndex;
 			public InternalString* __sFieldName;
 			public FieldInfo::Type __eType;
 			
@@ -23,6 +23,7 @@ namespace NumbatLogic
 					FieldInfo pFieldInfo = pObject.__pInfo.GetFieldInfoByNameAndType(__sFieldName.GetExternalString(), __eType);
 					if (!pFieldInfo)
 						return false;
+					__nFieldIndex = pFieldInfo.__nDataIndex;
 					__nDataIndex = pFieldInfo.__nDataIndex;
 				}
 				return true;

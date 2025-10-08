@@ -148,7 +148,7 @@
 				for ($j = 0; $j < sizeof($this->m_pFieldArray); $j++)
 				{
 					$pField = $this->m_pFieldArray[$j];
-					Output("\t\t\t__pFieldInfoVector.PushBack(new NetObject::FieldInfo(" . $pField->GetFieldInfoType() . ", \"" . $pField->m_sName . "\", " . $pField->m_nDataIndex . "));\n");
+					Output("\t\t\t__pFieldInfoVector.PushBack(new NetObject::FieldInfo(" . $pField->GetFieldInfoType() . ", \"" . $pField->m_sName . "\", " . $j . ", " . $pField->m_nDataIndex . "));\n");
 				}
 				Output("\t\t}\n");
 				Output("\t\tpublic destruct() { __pStatic = null; }\n");
@@ -198,8 +198,8 @@
 							throw new Error("Unable to find type for vector object " . $pField->m_sType);
 
 
-						Output("\t\tpublic int GetNum" . $pField->m_sName . "() { return __GetVectorSize(" . $pField->m_nDataIndex . "); }\n");
-						Output("\t\tpublic " . $pField->m_sType . " Get" . $pField->m_sName . "ByIndex(int nIndex) { return cast " . $pField->m_sType . "(__GetVectorObject(" . $pField->m_nDataIndex . ", nIndex)); }\n");
+						Output("\t\tpublic int GetNum" . $pField->m_sName . "() { return __GetVectorSize(" . $j . ", " . $pField->m_nDataIndex . "); }\n");
+						Output("\t\tpublic " . $pField->m_sType . " Get" . $pField->m_sName . "ByIndex(int nIndex) { return cast " . $pField->m_sType . "(__GetVectorObject(" . $j . ", " . $pField->m_nDataIndex . ", nIndex)); }\n");
 
 						// add custom lookup fields
 						if (sizeof($pField->m_sLookupFieldArray) > 0)
@@ -228,7 +228,7 @@
 								
 								Output("\t\tpublic " . $pField->m_sType . " Get" . $pField->m_sName . "By" . $pVectorObjectField->m_sName);
 									Output("(" . $pVectorObjectField->m_sType . " " . $sParamName . ") { return cast " . $pField->m_sType . "(");
-									Output("__GetVectorObjectBy" . $pVectorObjectField->GetDataType() . "(" . $pField->m_nDataIndex . ", " . $pVectorObjectField->m_nDataIndex . ", " . $sParamName . ")); }\n");
+									Output("__GetVectorObjectBy" . $pVectorObjectField->GetDataType() . "(" . $j . ", " . $pField->m_nDataIndex . ", " . $pVectorObjectField->m_nDataIndex . ", " . $sParamName . ")); }\n");
 							}
 						}
 					}
@@ -236,9 +236,9 @@
 					{
 						Output("\t\tpublic " . $pField->m_sType . " Get" . $pField->m_sName . "() { ");
 						if ($pField->IsCustomType())
-							Output("return cast " . $pField->m_sType . "(__Get" . $pField->GetDataType() . "(" . $pField->m_nDataIndex . ", $j));");
+							Output("return cast " . $pField->m_sType . "(__Get" . $pField->GetDataType() . "(" . $j . ", " . $pField->m_nDataIndex . "));");
 						else
-							Output("return __Get" . $pField->GetDataType() . "(" . $pField->m_nDataIndex . ", $j);");
+							Output("return __Get" . $pField->GetDataType() . "(" . $j . ", " . $pField->m_nDataIndex . ");");
 						Output(" }\n");
 					}
 				}

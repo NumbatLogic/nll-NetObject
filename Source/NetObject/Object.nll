@@ -306,25 +306,25 @@ namespace NumbatLogic
 			}
 
 			// todo: filter and range check!
-			public Uint32 __GetUint32(int nDataIndex, int nFieldIndex)
+			public Uint32 __GetUint32(Uint8 nFieldIndex, Uint8 nDataIndex)
 			{
 				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
 				return __pUint32Vector.Get(nDataIndex);
 			}
 
-			public string __GetString(int nIndex, int nFieldIndex)
+			public string __GetString(Uint8 nFieldIndex, Uint8 nDataIndex)
 			{
 				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
-				InternalString sTemp = __pStringVector.Get(nIndex);
+				InternalString sTemp = __pStringVector.Get(nDataIndex);
 				if (sTemp == null)
 					return "";
 				return sTemp.GetExternalString();
 			}
 
-			public void __SetString(int nDataIndex, string sxString)
+			public void __SetString(Uint8 nFieldIndex, Uint8 nDataIndex, string sxString)
 			{
 				Console::Log(sxString);
-				//Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
+				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
 				InternalString sTemp = __pStringVector.Get(nDataIndex);
 				if (sTemp == null)
 				{
@@ -335,21 +335,21 @@ namespace NumbatLogic
 				sTemp.Set(sxString);
 			}
 
-			public Object __GetObject(int nIndex, int nFieldIndex)
+			public Object __GetObject(Uint8 nFieldIndex, Uint8 nDataIndex)
 			{
 				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
-				return __pObjectVector.Get(nIndex);
+				return __pObjectVector.Get(nDataIndex);
 			}
 
-			public int __GetVectorSize(int nIndex)
+			public int __GetVectorSize(Uint8 nFieldIndex, Uint8 nDataIndex)
 			{
-				OwnedVector<Object> pVector = __pVectorVector.Get(nIndex);
+				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
 				if (pVector == null)
 					return 0;
 				return pVector.GetSize();
 			}
 
-			public Object __GetVectorObject(int nDataIndex, int nVectorIndex)
+			public Object __GetVectorObject(Uint8 nFieldIndex, Uint8 nDataIndex, int nVectorIndex)
 			{
 				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
 				Assert::Plz(pVector != null);
@@ -359,7 +359,7 @@ namespace NumbatLogic
 				return pVector.Get(nVectorIndex);
 			}
 
-			public Object __GetVectorObjectByUint32(int nDataIndex, int nVectorObjectDataIndex, Uint32 nValue)
+			public Object __GetVectorObjectByUint32(Uint8 nFieldIndex, Uint8 nDataIndex, int nVectorObjectDataIndex, Uint32 nValue)
 			{
 				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
 				// todo: filter check (before vector check?)
@@ -376,7 +376,7 @@ namespace NumbatLogic
 				return null;
 			}
 
-			public Object __GetVectorObjectByString(int nDataIndex, int nVectorObjectDataIndex, string sxValue)
+			public Object __GetVectorObjectByString(Uint8 nFieldIndex, Uint8 nDataIndex, int nVectorObjectDataIndex, string sxValue)
 			{
 				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
 
