@@ -13,21 +13,21 @@ namespace NumbatLogic
 				// set
 				{
 					Assert::Plz(pTestObjectA.GetGold() == 0);
-					NetObject::Change* pChange = own new NetObject::ChangeUint32Set("Gold", 1337);
+					NetObject::Change* pChange = own new NetObject::Uint32Set("Gold", 1337);
 					NetObject_Change::Test::ApplyPackUnpackApplyEquals(pTestObjectA, pTestObjectB, pChange);
 					Assert::Plz(pTestObjectA.GetGold() == 1337);
 				}
 
 				// add
 				{
-					NetObject::Change* pChange = own new NetObject::ChangeUint32Add("Gold", 1);
+					NetObject::Change* pChange = own new NetObject::Uint32Add("Gold", 1);
 					NetObject_Change::Test::ApplyPackUnpackApplyEquals(pTestObjectA, pTestObjectB, pChange);
 					Assert::Plz(pTestObjectA.GetGold() == 1338);
 				}
 
 				// subtract
 				{
-					NetObject::Change* pChange = own new NetObject::ChangeUint32Subtract("Gold", 1);
+					NetObject::Change* pChange = own new NetObject::Uint32Subtract("Gold", 1);
 					NetObject_Change::Test::ApplyPackUnpackApplyEquals(pTestObjectA, pTestObjectB, pChange);
 					Assert::Plz(pTestObjectA.GetGold() == 1337);
 				}

@@ -18,6 +18,9 @@ namespace NumbatLogic
 
 			public override bool Apply(Object pObject)
 			{
+				if (!base.Apply(pObject))
+					return false;
+
 				if (__sFieldName != null)
 				{
 					FieldInfo pFieldInfo = pObject.__pInfo.GetFieldInfoByNameAndType(__sFieldName.GetExternalString(), __eType);

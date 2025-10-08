@@ -2,10 +2,10 @@ namespace NumbatLogic
 {
 	namespace NetObject
 	{
-		class ChangeUint32Add : ChangeField
+		class Uint32Add : ChangeField
 		{
-			public static const Uint32 HASH = ExternalString::GetChecksum("ChangeUint32Add");
-			public static Change** __Create() { return new ChangeUint32Add(); }
+			public static const Uint32 HASH = ExternalString::GetChecksum("Uint32Add");
+			public static Change** __Create() { return new Uint32Add(); }
 			private construct() : base(HASH) {}
 
 			public Uint32 __nValue;

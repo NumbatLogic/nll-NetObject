@@ -5,6 +5,7 @@ namespace NumbatLogic
 		class Change
 		{
 			public Uint32 __nHash;
+			public bool __bApplied;
 
 			public construct(Uint32 nHash)
 			{
@@ -13,8 +14,11 @@ namespace NumbatLogic
 
 			public virtual bool Apply(Object pObject)
 			{
-				Assert::Plz(false);
-				return false;
+				if (__bApplied)
+					return false;
+
+				__bApplied = true;
+				return true;
 			}
 
 			public virtual void Pack(gsBlob pBlob)

@@ -25,10 +25,10 @@ namespace NumbatLogic
 				Assert::Plz(__pCallbackInfoVector == null);
 				__pCallbackInfoVector = own new OwnedVector<ChangeCreateCallbackInfo>();
 
-				Register(ChangeUint32Add::HASH, ChangeUint32Add::__Create);
-				Register(ChangeUint32Set::HASH, ChangeUint32Set::__Create);
-				Register(ChangeUint32Subtract::HASH, ChangeUint32Subtract::__Create);
 				Register(StringSet::HASH, StringSet::__Create);
+				Register(Uint32Add::HASH, Uint32Add::__Create);
+				Register(Uint32Set::HASH, Uint32Set::__Create);
+				Register(Uint32Subtract::HASH, Uint32Subtract::__Create);
 			}
 			
 			public static void Register(Uint32 nHash, ChangeCreateCallbackInfo::Callback pCallback)
