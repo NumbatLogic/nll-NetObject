@@ -2,45 +2,33 @@ namespace NumbatLogic
 {
 	namespace NetObject
 	{
-		class Changeset : Change
+		class Changeset
 		{
-			public static const Uint32 HASH = ExternalString::GetChecksum("Changeset");
-			public static Change** __Create() { return new Changeset(); }
-			public construct() : base(HASH)
-			{
-				__pChangeVector = own new OwnedVector<Change>();
-			}
-
 			public OwnedVector<Change>* __pChangeVector;
-
-			public construct(Uint32 nHash) : base(nHash)
+			
+			public construct()
 			{
 				__pChangeVector = own new OwnedVector<Change>();
 			}
-
+			
 			public void AddChange(Change** pChange)
 			{
 				__pChangeVector.PushBack(pChange);
 			}
 
-			public override bool Apply(Object pObject)
+			public bool Apply(Object pObject)
 			{
-				if (!base.Apply(pObject))
-					return false;
-
 				for (int i = 0; i < __pChangeVector.GetSize(); i++)
 				{
 					Change pChange = __pChangeVector.Get(i);
-					pChange.Apply(pObject);
+					if (!pChange.Apply(pObject))
+						return false;
 				}
-
 				return true;
 			}
 
-			public override void Pack(gsBlob pBlob)
+			public void Pack(gsBlob pBlob)
 			{
-				base.Pack(pBlob);
-
 				pBlob.PackUint8(__pChangeVector.GetSize());
 				for (int i = 0; i < __pChangeVector.GetSize(); i++)
 				{
@@ -51,16 +39,15 @@ namespace NumbatLogic
 
 			public override bool Unpack(gsBlob pBlob)
 			{
-				if (!base.Unpack(pBlob))
-					return false;
-				
+				Assert::Plz(__pChangeVector.GetSize() == 0);
+
 				Uint8 nCount;
 				if (!pBlob.UnpackUint8(nCount))
 					return false;
 
 				for (int i = 0; i < nCount; i++)
 				{
-					Change* pChange = own CreateAndUnpack(pBlob);
+					Change* pChange = own Change::CreateAndUnpack(pBlob);
 					if (pChange == null)
 						return false;
 					AddChange(disown pChange);

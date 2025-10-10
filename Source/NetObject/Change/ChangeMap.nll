@@ -25,7 +25,8 @@ namespace NumbatLogic
 				Assert::Plz(__pCallbackInfoVector == null);
 				__pCallbackInfoVector = own new OwnedVector<ChangeCreateCallbackInfo>();
 
-				Register(Changeset::HASH, Changeset::__Create);
+				Register(ObjectCreate::HASH, ObjectCreate::__Create);
+				Register(RootChange::HASH, RootChange::__Create);
 				Register(StringSet::HASH, StringSet::__Create);
 				Register(Uint32Add::HASH, Uint32Add::__Create);
 				Register(Uint32Set::HASH, Uint32Set::__Create);

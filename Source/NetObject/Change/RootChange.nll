@@ -1,0 +1,47 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class RootChange : Change
+		{
+			public Changeset* __pChangeset;
+
+			public static const Uint32 HASH = ExternalString::GetChecksum("RootChange");
+			public static Change** __Create() { return new RootChange(); }
+			public construct() : base(HASH)
+			{
+				__pChangeset = own new Changeset();
+			}
+
+			public construct(Uint32 nHash) : base(nHash)
+			{
+				__pChangeset = own new Changeset();
+			}
+
+			public void AddChange(Change** pChange)
+			{
+				__pChangeset.AddChange(pChange);
+			}
+
+			public override bool Apply(Object pObject)
+			{
+				if (!base.Apply(pObject))
+					return false;
+				return __pChangeset.Apply(pObject);
+			}
+
+			public override void Pack(gsBlob pBlob)
+			{
+				base.Pack(pBlob);
+				__pChangeset.Pack(pBlob);
+			}
+
+			public override bool Unpack(gsBlob pBlob)
+			{
+				if (!base.Unpack(pBlob))
+					return false;
+				return __pChangeset.Unpack(pBlob);
+			}
+		}
+	}
+}

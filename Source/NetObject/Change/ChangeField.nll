@@ -26,7 +26,7 @@ namespace NumbatLogic
 					FieldInfo pFieldInfo = pObject.__pInfo.GetFieldInfoByNameAndType(__sFieldName.GetExternalString(), __eType);
 					if (!pFieldInfo)
 						return false;
-					__nFieldIndex = pFieldInfo.__nDataIndex;
+					__nFieldIndex = pFieldInfo.__nFieldIndex;
 					__nDataIndex = pFieldInfo.__nDataIndex;
 				}
 				return true;
@@ -35,12 +35,15 @@ namespace NumbatLogic
 			public override void Pack(gsBlob pBlob)
 			{
 				base.Pack(pBlob);
-				pBlob.PackUint8(__nDataIndex);
+				pBlob.PackUint8(__nFieldIndex);
+				pBlob.PackUint8(__nDataIndex); // wasteful
 			}
 
 			public override bool Unpack(gsBlob pBlob)
 			{
 				if (!base.Unpack(pBlob))
+					return false;
+				if (!pBlob.UnpackUint8(__nFieldIndex))
 					return false;
 				if (!pBlob.UnpackUint8(__nDataIndex))
 					return false;

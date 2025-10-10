@@ -1,0 +1,84 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class ObjectCreate : Change
+		{
+			public Uint8 __nFieldIndex;
+			public InternalString* __sFieldName;
+			public Changeset* __pChangeset;
+
+			public static const Uint32 HASH = ExternalString::GetChecksum("ObjectCreate");
+			public static Change** __Create() { return new ObjectCreate(); }
+			private construct() : base(HASH)
+			{
+				__pChangeset = own new Changeset();
+			}
+
+			public construct(string sxFieldName) : base(HASH)
+			{
+				__sFieldName = own new InternalString(sxFieldName);
+				__pChangeset = own new Changeset();
+			}
+
+			public void AddChange(Change** pChange)
+			{
+				__pChangeset.AddChange(pChange);
+			}
+
+			public override bool Apply(Object pObject)
+			{
+				if (!base.Apply(pObject))
+					return false;
+
+				FieldInfo pFieldInfo;
+				if (__sFieldName != null)
+				{
+					pFieldInfo = pObject.__pInfo.GetFieldInfoByName(__sFieldName.GetExternalString());
+					if (!pFieldInfo)
+						return false;
+					__nFieldIndex = pFieldInfo.__nFieldIndex;
+				}
+				else
+				{
+					pFieldInfo = pObject.__pInfo.__pFieldInfoVector.Get(__nFieldIndex);
+				}
+
+				if (pFieldInfo.__eType == FieldInfo::Type::OBJECT)
+				{
+					if (pObject.__pObjectVector.Get(pFieldInfo.__nDataIndex) != null)
+						return false;
+				
+					// todo: filter!
+					Object* pChild = own pObject.__pInfo.__CreateChildObject(__nFieldIndex, null);
+					if (!__pChangeset.Apply(pChild))
+						return false;
+					pObject.__pObjectVector.Set(pFieldInfo.__nDataIndex, disown pChild);
+					return true;
+				}
+
+				if (pFieldInfo.__eType == FieldInfo::Type::VECTOR)
+				{
+					return false;
+				}
+				return false;
+			}
+
+			public override void Pack(gsBlob pBlob)
+			{
+				base.Pack(pBlob);
+				pBlob.PackUint8(__nFieldIndex);
+				__pChangeset.Pack(pBlob);
+			}
+
+			public override bool Unpack(gsBlob pBlob)
+			{
+				if (!base.Unpack(pBlob))
+					return false;
+				if (!pBlob.UnpackUint8(__nFieldIndex))
+					return false;
+				return __pChangeset.Unpack(pBlob);
+			}
+		}
+	}
+}

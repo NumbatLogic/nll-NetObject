@@ -323,7 +323,6 @@ namespace NumbatLogic
 
 			public void __SetString(Uint8 nFieldIndex, Uint8 nDataIndex, string sxString)
 			{
-				Console::Log(sxString);
 				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
 				InternalString sTemp = __pStringVector.Get(nDataIndex);
 				if (sTemp == null)
