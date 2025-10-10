@@ -1,0 +1,32 @@
+namespace NumbatLogic
+{
+	namespace NetObject_ChangeMultiple
+	{
+		class Test
+		{
+			public static void Run()
+			{
+				NetObject_Change::NetObjectStatic* pStaticInfo = own new NetObject_Change::NetObjectStatic();
+				NetObject_Change::TestObject* pTestObjectA = own new NetObject_Change::TestObject();
+				NetObject_Change::TestObject* pTestObjectB = own new NetObject_Change::TestObject();
+
+				NetObject::Changeset* pChangeset = own new NetObject::Changeset();
+				pChangeset.AddChange(new NetObject::StringSet("Name", "banana"));
+				pChangeset.AddChange(new NetObject::Uint32Set("Gold", 1));
+
+				Assert::Plz(ExternalString::Equal(pTestObjectA.GetName(), ""));
+				Assert::Plz(pTestObjectA.GetGold() == 0);
+
+				NetObject_Change::Test::ApplyPackUnpackApplyEquals(pTestObjectA, pTestObjectB, pChangeset);
+
+				Assert::Plz(ExternalString::Equal(pTestObjectA.GetName(), "banana"));
+				Assert::Plz(pTestObjectA.GetGold() == 1);
+
+
+				// create + set
+
+				// navigate + set
+			}
+		}
+	}
+} 
