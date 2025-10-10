@@ -2,130 +2,41 @@ namespace NumbatLogic
 {
 	namespace NetObject_BlobPack
 	{
-		/*<?
-			include_once "../../Metaprogramming.php";
-
-			$pOutputArray = array();
-
-			$pObjectChild = new NetObject("Child",
-				[
-					new NetObjectField("Uint32", "ChildId"),
-					new NetObjectField("string", "Name"),
-				]
-			);
-			$pOutputArray[] = $pObjectChild;
-
-			$pObjectParent = new NetObject("Parent",
-				[
-					new NetObjectField("Uint32", "ParentId"),
-					new NetObjectField("Child", "Child"),
-				]
-			);
-			$pOutputArray[] = $pObjectParent;
-
-			NetObject_Output($pOutputArray);
-		?>*/
-			class ChildInfo : NetObject::ObjectInfo
-			{
-				public static ChildInfo __pStatic = null;
-				public construct() : base(1, 1, 0, 0)
-				{
-					Assert::Plz(__pStatic == null);
-					__pStatic = this;
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ChildId", 0, 0));
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::STRING, "Name", 1, 0));
-				}
-				public destruct() { __pStatic = null; }
-				public static ChildInfo GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }
-			}
-
-			class Child : NetObject::Object
-			{
-				public construct(NetObject::Filter pFilter = null) : base(ChildInfo::GetStatic(), pFilter) { }
-				public Uint32 GetChildId() { return __GetUint32(0, 0); }
-				public string GetName() { return __GetString(1, 0); }
-			}
-
-			class ParentInfo : NetObject::ObjectInfo
-			{
-				public static ParentInfo __pStatic = null;
-				public construct() : base(1, 0, 1, 0)
-				{
-					Assert::Plz(__pStatic == null);
-					__pStatic = this;
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "ParentId", 0, 0));
-					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::OBJECT, "Child", 1, 0));
-				}
-				public destruct() { __pStatic = null; }
-				public static ParentInfo GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }
-				public override NetObject::Object** __CreateChildObject(int nFieldIndex, NetObject::Filter pFilter)
-				{
-					switch (nFieldIndex)
-					{
-						case 1: return new Child();
-					}
-					Assert::Plz(false);
-					return null;
-				}
-			}
-
-			class Parent : NetObject::Object
-			{
-				public construct(NetObject::Filter pFilter = null) : base(ParentInfo::GetStatic(), pFilter) { }
-				public Uint32 GetParentId() { return __GetUint32(0, 0); }
-				public Child GetChild() { return cast Child(__GetObject(1, 0)); }
-			}
-
-			class NetObjectStatic
-			{
-				public NetObject::ChangeMap* __pChangeMap;
-				public ChildInfo* m_pChildInfo;
-				public ParentInfo* m_pParentInfo;
-				public construct()
-				{
-					__pChangeMap = own new NetObject::ChangeMap();
-					m_pChildInfo = own new ChildInfo();
-					m_pParentInfo = own new ParentInfo();
-				}
-			}
-		/*<??>*/
-		
 		class Test
 		{
 			public static void Run()
 			{
-				NetObjectStatic* pStaticInfo = own new NetObjectStatic();
+				NetObject_Change::NetObjectStatic* pStaticInfo = own new NetObject_Change::NetObjectStatic();
+				NetObject_Change::TestObject* pTestObjectA = own new NetObject_Change::TestObject();
+				NetObject_Change::TestObject* pTestObjectB = own new NetObject_Change::TestObject();
+				NetObject_Change::TestObject* pTestObjectC = own new NetObject_Change::TestObject();
+				
+				Assert::Plz(pTestObjectA.GetTestId() == 0);
+				pTestObjectA.__pUint32Vector.Set(0, 1234);
+				Assert::Plz(pTestObjectA.GetTestId() == 1234);
 
-				Parent* pObjectA = own new Parent();
+				pTestObjectA.__pObjectVector.Set(0, new NetObject_Change::TestChild());
+				NetObject_Change::TestChild pChild = pTestObjectA.GetSingleChild();
 
-				Assert::Plz(pObjectA.GetParentId() == 0);
-				pObjectA.__pUint32Vector.Set(0, 1234);
-				Assert::Plz(pObjectA.GetParentId() == 1234);
-
-				pObjectA.__pObjectVector.Set(0, new Child());
-				Child pChild = pObjectA.GetChild();
-
-				Assert::Plz(pChild.GetChildId() == 0);
+				Assert::Plz(pChild.GetTestChildId() == 0);
 				pChild.__pUint32Vector.Set(0, 2222);
-				Assert::Plz(pChild.GetChildId() == 2222);
+				Assert::Plz(pChild.GetTestChildId() == 2222);
 
 				Assert::Plz(ExternalString::Equal(pChild.GetName(), ""));
 				pChild.__pStringVector.Set(0, new InternalString("banana"));
 				Assert::Plz(ExternalString::Equal(pChild.GetName(), "banana"));
 
 				gsBlob* pBlob = own new gsBlob();
-				pObjectA.Pack(pBlob);
+				pTestObjectA.Pack(pBlob);
 				
 				pBlob.SetOffset(0);
 
-				Parent* pObjectB = own new Parent();
-				Assert::Plz(!pObjectB.IsEqual(pObjectA));
-				Assert::Plz(pObjectB.Unpack(pBlob));
-				Assert::Plz(pObjectB.IsEqual(pObjectA));
+				Assert::Plz(!pTestObjectB.IsEqual(pTestObjectA));
+				Assert::Plz(pTestObjectB.Unpack(pBlob));
+				Assert::Plz(pTestObjectB.IsEqual(pTestObjectA));
 
-				Parent* pObjectC = own new Parent();
-				Assert::Plz(!pObjectC.Unpack(pBlob));
-				Assert::Plz(!pObjectC.IsEqual(pObjectA));
+				Assert::Plz(!pTestObjectC.Unpack(pBlob));
+				Assert::Plz(!pTestObjectC.IsEqual(pTestObjectA));
 
 				//vector test!
 				//vector pack?
