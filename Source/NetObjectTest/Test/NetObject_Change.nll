@@ -21,6 +21,7 @@ namespace NumbatLogic
 					new NetObjectField("string", "Name"),
 					new NetObjectField("Uint32", "Gold"),
 					new NetObjectField("TestChild", "SingleChild"),
+					new NetObjectVectorField("TestChild", "MultiChild", array("TestChildId", "Name")),
 				]
 			);
 			$pOutputArray[] = $pTestObject;
@@ -51,7 +52,7 @@ namespace NumbatLogic
 			class TestObjectInfo : NetObject::ObjectInfo
 			{
 				public static TestObjectInfo __pStatic = null;
-				public construct() : base(2, 1, 1, 0)
+				public construct() : base(2, 1, 1, 1)
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;
@@ -59,6 +60,7 @@ namespace NumbatLogic
 					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::STRING, "Name", 1, 0));
 					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::UINT32, "Gold", 2, 1));
 					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::OBJECT, "SingleChild", 3, 0));
+					__pFieldInfoVector.PushBack(new NetObject::FieldInfo(NetObject::FieldInfo::Type::VECTOR, "MultiSpawn", 4, 0));
 				}
 				public destruct() { __pStatic = null; }
 				public static TestObjectInfo GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }
@@ -67,6 +69,7 @@ namespace NumbatLogic
 					switch (nFieldIndex)
 					{
 						case 3: return new TestChild();
+						case 4: return new TestChild();
 					}
 					Assert::Plz(false);
 					return null;
@@ -80,6 +83,10 @@ namespace NumbatLogic
 				public string GetName() { return __GetString(1, 0); }
 				public Uint32 GetGold() { return __GetUint32(2, 1); }
 				public TestChild GetSingleChild() { return cast TestChild(__GetObject(3, 0)); }
+				public int GetNumMultiSpawn() { return __GetVectorSize(4, 0); }
+				public TestChild GetMultiSpawnByIndex(int nIndex) { return cast TestChild(__GetVectorObject(4, 0, nIndex)); }
+				public TestChild GetMultiSpawnByTestChildId(Uint32 nTestChildId) { return cast TestChild(__GetVectorObjectByUint32(4, 0, 0, nTestChildId)); }
+				public TestChild GetMultiSpawnByName(string sName) { return cast TestChild(__GetVectorObjectByString(4, 0, 0, sName)); }
 			}
 
 			class NetObjectStatic
