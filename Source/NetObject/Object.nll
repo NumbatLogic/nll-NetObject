@@ -400,6 +400,19 @@ namespace NumbatLogic
 				}
 				return null;
 			}
+
+			public bool __VectorPushBack(Uint8 nFieldIndex, Uint8 nDataIndex, Object** pObject)
+			{
+				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
+				if (pVector == null)
+				{
+					__pVectorVector.Set(nDataIndex, new OwnedVector<Object>());
+					pVector = __pVectorVector.Get(nDataIndex);
+				}
+				pVector.PushBack(pObject);
+
+				return true;
+			}
 		}
 	}
 }

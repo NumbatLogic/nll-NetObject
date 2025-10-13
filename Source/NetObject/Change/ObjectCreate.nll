@@ -44,24 +44,24 @@ namespace NumbatLogic
 					pFieldInfo = pObject.__pInfo.__pFieldInfoVector.Get(__nFieldIndex);
 				}
 
+				if (pFieldInfo.__eType != FieldInfo::Type::OBJECT && pFieldInfo.__eType != FieldInfo::Type::VECTOR)
+					return false;
+
+				// todo: filter!
+				Object* pChild = own pObject.__pInfo.__CreateChildObject(__nFieldIndex, null);
+				if (!__pChangeset.Apply(pChild))
+					return false;
+
+
 				if (pFieldInfo.__eType == FieldInfo::Type::OBJECT)
 				{
 					if (pObject.__pObjectVector.Get(pFieldInfo.__nDataIndex) != null)
-						return false;
-				
-					// todo: filter!
-					Object* pChild = own pObject.__pInfo.__CreateChildObject(__nFieldIndex, null);
-					if (!__pChangeset.Apply(pChild))
 						return false;
 					pObject.__pObjectVector.Set(pFieldInfo.__nDataIndex, disown pChild);
 					return true;
 				}
 
-				if (pFieldInfo.__eType == FieldInfo::Type::VECTOR)
-				{
-					return false;
-				}
-				return false;
+				return pObject.__VectorPushBack(pFieldInfo.__nFieldIndex, pFieldInfo.__nDataIndex, disown pChild);
 			}
 
 			public override void Pack(gsBlob pBlob)
