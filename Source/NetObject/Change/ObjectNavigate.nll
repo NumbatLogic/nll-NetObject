@@ -5,6 +5,7 @@ namespace NumbatLogic
 		class ObjectNavigate : Change
 		{
 			public Uint8 __nFieldIndex;
+			public Uint8 __nVectorIndex;
 			public InternalString* __sFieldName;
 			public Changeset* __pChangeset;
 
@@ -18,6 +19,13 @@ namespace NumbatLogic
 			public construct(string sxFieldName) : base(HASH)
 			{
 				__sFieldName = own new InternalString(sxFieldName);
+				__pChangeset = own new Changeset();
+			}
+
+			public construct(string sxFieldName, Uint8 nVectorIndex) : base(HASH)
+			{
+				__sFieldName = own new InternalString(sxFieldName);
+				__nVectorIndex = nVectorIndex;
 				__pChangeset = own new Changeset();
 			}
 
@@ -48,7 +56,7 @@ namespace NumbatLogic
 				if (pFieldInfo.__eType == FieldInfo::Type::OBJECT)
 					pChild = pObject.__pObjectVector.Get(pFieldInfo.__nDataIndex);
 				else if (pFieldInfo.__eType == FieldInfo::Type::VECTOR)
-					pChild = pObject.__GetObject(pFieldInfo.__nFieldIndex, pFieldInfo.__nDataIndex);
+					pChild = pObject.__GetVectorObject(pFieldInfo.__nFieldIndex, pFieldInfo.__nDataIndex, __nVectorIndex);
 				if (pChild == null)
 					return false;
 				return __pChangeset.Apply(pChild);
@@ -58,6 +66,7 @@ namespace NumbatLogic
 			{
 				base.Pack(pBlob);
 				pBlob.PackUint8(__nFieldIndex);
+				pBlob.PackUint8(__nVectorIndex);
 				__pChangeset.Pack(pBlob);
 			}
 
@@ -66,6 +75,8 @@ namespace NumbatLogic
 				if (!base.Unpack(pBlob))
 					return false;
 				if (!pBlob.UnpackUint8(__nFieldIndex))
+					return false;
+				if (!pBlob.UnpackUint8(__nVectorIndex))
 					return false;
 				return __pChangeset.Unpack(pBlob);
 			}

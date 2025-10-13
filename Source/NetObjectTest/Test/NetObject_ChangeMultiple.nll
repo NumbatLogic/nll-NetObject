@@ -72,8 +72,23 @@ namespace NumbatLogic
 				}
 
 				// navigate vector, index? field equal?
+				{
+					NetObject::RootChange* pRootChange = own new NetObject::RootChange();
+					Assert::Plz(pTestObjectA.GetNumMultiChild() == 1);
+					NetObject::ObjectNavigate* pObjectNavigate = own new NetObject::ObjectNavigate("MultiChild", 0);
+						pObjectNavigate.AddChange(new NetObject::StringSet("Name", "navigate multi child name"));
+					pRootChange.AddChange(disown pObjectNavigate);
 
-				// make seperate path test (nested objects, vector etc)
+					NetObject_Change::Test::ApplyPackUnpackApplyEquals(pTestObjectA, pTestObjectB, pRootChange);
+
+					Assert::Plz(pTestObjectA.GetNumMultiChild() == 1);
+					NetObject_Change::TestChild pChild = pTestObjectA.GetMultiChildByIndex(0);
+					Assert::Plz(ExternalString::Equal(pChild.GetName(), "navigate multi child name"));
+				}
+
+				// make seperate path test (nested objects, vector etc) "MultiChild[0]/thing"
+					// how will multi changes store path? vector vs field index
+					// can just walk the path and know if next int is object or index
 			}
 		}
 	}
