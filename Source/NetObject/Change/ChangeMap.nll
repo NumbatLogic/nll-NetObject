@@ -26,6 +26,7 @@ namespace NumbatLogic
 				__pCallbackInfoVector = own new OwnedVector<ChangeCreateCallbackInfo>();
 
 				Register(ObjectCreate::HASH, ObjectCreate::__Create);
+				Register(ObjectNavigate::HASH, ObjectNavigate::__Create);
 				Register(RootChange::HASH, RootChange::__Create);
 				Register(StringSet::HASH, StringSet::__Create);
 				Register(Uint32Add::HASH, Uint32Add::__Create);

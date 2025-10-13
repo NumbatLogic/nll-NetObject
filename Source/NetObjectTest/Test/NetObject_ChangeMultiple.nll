@@ -56,8 +56,24 @@ namespace NumbatLogic
 				}
 
 				// navigate object
+				{
+					NetObject::RootChange* pRootChange = own new NetObject::RootChange();
+					NetObject_Change::TestChild pChild = pTestObjectA.GetSingleChild();
+					Assert::Plz(ExternalString::Equal(pChild.GetName(), "child name!"));
+
+					NetObject::ObjectNavigate* pObjectNavigate = own new NetObject::ObjectNavigate("SingleChild");
+						pObjectNavigate.AddChange(new NetObject::StringSet("Name", "navigate child name"));
+					pRootChange.AddChange(disown pObjectNavigate);
+
+					NetObject_Change::Test::ApplyPackUnpackApplyEquals(pTestObjectA, pTestObjectB, pRootChange);
+
+					Assert::Plz(pChild == pTestObjectA.GetSingleChild());
+					Assert::Plz(ExternalString::Equal(pChild.GetName(), "navigate child name"));
+				}
 
 				// navigate vector, index? field equal?
+
+				// make seperate path test (nested objects, vector etc)
 			}
 		}
 	}
