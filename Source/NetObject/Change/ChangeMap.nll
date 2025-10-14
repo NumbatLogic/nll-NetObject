@@ -18,6 +18,7 @@ namespace NumbatLogic
 
 		class ChangeMap
 		{
+			//public static int __nInitCount;
 			public static OwnedVector<ChangeCreateCallbackInfo>* __pCallbackInfoVector;
 			
 			public construct()
@@ -32,6 +33,11 @@ namespace NumbatLogic
 				Register(Uint32Add::HASH, Uint32Add::__Create);
 				Register(Uint32Set::HASH, Uint32Set::__Create);
 				Register(Uint32Subtract::HASH, Uint32Subtract::__Create);
+			}
+
+			public destruct()
+			{
+				delete __pCallbackInfoVector;
 			}
 			
 			public static void Register(Uint32 nHash, ChangeCreateCallbackInfo::Callback pCallback)

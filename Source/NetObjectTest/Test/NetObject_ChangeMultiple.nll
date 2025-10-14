@@ -85,10 +85,6 @@ namespace NumbatLogic
 					NetObject_Change::TestChild pChild = pTestObjectA.GetMultiChildByIndex(0);
 					Assert::Plz(ExternalString::Equal(pChild.GetName(), "navigate multi child name"));
 				}
-
-				// make seperate path test (nested objects, vector etc) "MultiChild[0]/thing"
-					// how will multi changes store path? vector vs field index
-					// can just walk the path and know if next int is object or index
 			}
 		}
 	}
