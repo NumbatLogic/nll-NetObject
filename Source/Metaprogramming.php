@@ -25,8 +25,6 @@
 			$this->m_sName = $sName;
 			$this->m_bVector = false;
 			$this->m_nDataIndex = 0;
-
-			
 		}
 
 		function GetMemberType()
@@ -106,6 +104,7 @@
   		public $m_sName;
 		public $m_pFieldArray;
 		public $m_nDataSizeMap;
+		public $m_bOutput;
   		
 		function __construct(string $sName, array $pFieldArray)
 		{
@@ -123,10 +122,16 @@
 				$pField = $this->m_pFieldArray[$j];
 				$pField->m_nDataIndex = $this->m_nDataSizeMap[$pField->GetDataType()]++;
 			}
+
+			$this->m_bOutput = false;
 		}
 
 		public function Output(array $pObjectArray)
 		{
+			if ($this->m_bOutput)
+				return;
+			$this->m_bOutput = true;
+
 			if (sizeof($this->m_pFieldArray) == 0)
 			{
 				echo $this->m_sName . " has no fields, skipping!!!!\n";
@@ -340,7 +345,7 @@
 		}
 	};
 
-	function NetObject_Output($pObjectArray, $sContainerName = "NetObjectStatic")
+	function NetObject_Output($pObjectArray, $bDoStatic = false)
 	{
 		for ($i = 0; $i < sizeof($pObjectArray); $i++)
 		{
@@ -351,35 +356,38 @@
 			$pObject->Output($pObjectArray);
 		}
 
-		Output("\n");
-		Output("\tclass " . $sContainerName . "\n");
-		Output("\t{\n");
-			Output("\t\tpublic NetObject::ChangeMap* __pChangeMap;\n");
-			for ($i = 0; $i < sizeof($pObjectArray); $i++)
-			{
-				if ($i > 0)
-					Output("\n");
-
-				$pObject = $pObjectArray[$i];
-				$sPostFix = "";
-				if (is_a($pObject, "NetObject"))
-					$sPostFix = "Info";
-				Output("\t\tpublic " . $pObject->m_sName . $sPostFix . "* m_p" . $pObject->m_sName . $sPostFix . ";");
-				// info vs filter...
-			}
+		if ($bDoStatic)
+		{
 			Output("\n");
-			Output("\t\tpublic construct()\n");
-			Output("\t\t{\n");
-			Output("\t\t\t__pChangeMap = own new NetObject::ChangeMap();\n");
-			for ($i = 0; $i < sizeof($pObjectArray); $i++)
-			{
-				$pObject = $pObjectArray[$i];
-				$sPostFix = "";
-				if (is_a($pObject, "NetObject"))
-					$sPostFix = "Info";
-				Output("\t\t\tm_p" . $pObject->m_sName . $sPostFix . " = own new " . $pObject->m_sName . $sPostFix . "();\n");
-			}
-			Output("\t\t}\n");
-		Output("\t}\n");
+			Output("\tclass NetObjectStatic\n");
+			Output("\t{\n");
+				Output("\t\tpublic NetObject::ChangeMap* __pChangeMap;\n");
+				for ($i = 0; $i < sizeof($pObjectArray); $i++)
+				{
+					if ($i > 0)
+						Output("\n");
+
+					$pObject = $pObjectArray[$i];
+					$sPostFix = "";
+					if (is_a($pObject, "NetObject"))
+						$sPostFix = "Info";
+					Output("\t\tpublic " . $pObject->m_sName . $sPostFix . "* __p" . $pObject->m_sName . $sPostFix . ";");
+					// info vs filter...
+				}
+				Output("\n");
+				Output("\t\tpublic construct()\n");
+				Output("\t\t{\n");
+				Output("\t\t\t__pChangeMap = own new NetObject::ChangeMap();\n");
+				for ($i = 0; $i < sizeof($pObjectArray); $i++)
+				{
+					$pObject = $pObjectArray[$i];
+					$sPostFix = "";
+					if (is_a($pObject, "NetObject"))
+						$sPostFix = "Info";
+					Output("\t\t\t__p" . $pObject->m_sName . $sPostFix . " = own new " . $pObject->m_sName . $sPostFix . "();\n");
+				}
+				Output("\t\t}\n");
+			Output("\t}\n");
+		}
 	}
 ?>

@@ -34,7 +34,7 @@ namespace NumbatLogic
 			));
 			$pOutputArray[] = $pFilterParent;
 
-			NetObject_Output($pOutputArray);
+			NetObject_Output($pOutputArray, true);
 		?>*/
 			class ChildInfo : NetObject::ObjectInfo
 			{
@@ -115,15 +115,15 @@ namespace NumbatLogic
 			class NetObjectStatic
 			{
 				public NetObject::ChangeMap* __pChangeMap;
-				public ChildInfo* m_pChildInfo;
-				public ParentInfo* m_pParentInfo;
-				public ParentFilter* m_pParentFilter;
+				public ChildInfo* __pChildInfo;
+				public ParentInfo* __pParentInfo;
+				public ParentFilter* __pParentFilter;
 				public construct()
 				{
 					__pChangeMap = own new NetObject::ChangeMap();
-					m_pChildInfo = own new ChildInfo();
-					m_pParentInfo = own new ParentInfo();
-					m_pParentFilter = own new ParentFilter();
+					__pChildInfo = own new ChildInfo();
+					__pParentInfo = own new ParentInfo();
+					__pParentFilter = own new ParentFilter();
 				}
 			}
 		/*<??>*/

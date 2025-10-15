@@ -4,7 +4,7 @@ namespace NumbatLogic
 	{
 		/*<?
 			include_once "../../Metaprogramming.php";
-
+			
 			$pOutputArray = array();
 
 			$pTestChild = new NetObject("TestChild",
@@ -26,7 +26,7 @@ namespace NumbatLogic
 			);
 			$pOutputArray[] = $pTestObject;
 
-			NetObject_Output($pOutputArray);
+			NetObject_Output($pOutputArray, true);
 		?>*/
 			class TestChildInfo : NetObject::ObjectInfo
 			{
@@ -92,13 +92,13 @@ namespace NumbatLogic
 			class NetObjectStatic
 			{
 				public NetObject::ChangeMap* __pChangeMap;
-				public TestChildInfo* m_pTestChildInfo;
-				public TestObjectInfo* m_pTestObjectInfo;
+				public TestChildInfo* __pTestChildInfo;
+				public TestObjectInfo* __pTestObjectInfo;
 				public construct()
 				{
 					__pChangeMap = own new NetObject::ChangeMap();
-					m_pTestChildInfo = own new TestChildInfo();
-					m_pTestObjectInfo = own new TestObjectInfo();
+					__pTestChildInfo = own new TestChildInfo();
+					__pTestObjectInfo = own new TestObjectInfo();
 				}
 			}
 		/*<??>*/
