@@ -27,6 +27,7 @@ namespace NumbatLogic
 			{
 				if (!base.Apply(pObject))
 					return false;
+				__bApplied = false;
 				return __pChangeset.Apply(pObject);
 			}
 

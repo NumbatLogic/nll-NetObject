@@ -21,8 +21,9 @@ namespace NumbatLogic
 				for (int i = 0; i < __pChangeVector.GetSize(); i++)
 				{
 					Change pChange = __pChangeVector.Get(i);
-					if (!pChange.Apply(pObject))
-						return false;
+					if (!pChange.__bApplied)
+						if (!pChange.Apply(pObject))
+							return false;
 				}
 				return true;
 			}
