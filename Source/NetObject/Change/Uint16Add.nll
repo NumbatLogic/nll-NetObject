@@ -1,0 +1,43 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class Uint16Add : ChangeField
+		{
+			public static const Uint32 HASH = ExternalString::GetChecksum("Uint16Add");
+			public static Change** __Create() { return new Uint16Add(); }
+			private construct() : base(HASH) {}
+
+			public Uint16 __nValue;
+
+			public construct(string sxFieldName, Uint16 nValue) : base(HASH, FieldInfo::Type::UINT16, sxFieldName)
+			{
+				__nValue = nValue;
+			}
+
+			public override bool Apply(Object pObject)
+			{
+				if (!base.Apply(pObject))
+					return false;
+				
+				pObject.__pUint16Vector.Set(__nDataIndex, pObject.__pUint16Vector.Get(__nDataIndex) + __nValue);
+				return true;
+			}
+
+			public override void Pack(gsBlob pBlob)
+			{
+				base.Pack(pBlob);
+				pBlob.PackUint16(__nValue);
+			}
+
+			public override bool Unpack(gsBlob pBlob)
+			{
+				if (!base.Unpack(pBlob))
+					return false;
+				if (!pBlob.UnpackUint16(__nValue))
+					return false;
+				return true;
+			}
+		}
+	}
+}

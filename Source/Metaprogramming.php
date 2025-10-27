@@ -6,6 +6,7 @@
 	{
 		switch ($sType)
 		{
+			case "Uint16": return "n";
 			case "Uint32": return "n";
 			case "string": return "s";
 		}
@@ -41,7 +42,7 @@
 
 		function IsBasicType()
 		{
-			return $this->m_sType == "Uint32";
+			return $this->m_sType == "Uint16" || $this->m_sType == "Uint32";
 		}
 
 		function IsString()
@@ -76,6 +77,7 @@
 		{
 			switch ($this->m_sType)
 			{
+				case "Uint16": return "NetObject::FieldInfo::Type::UINT16";
 				case "Uint32": return "NetObject::FieldInfo::Type::UINT32";
 				case "string": return "NetObject::FieldInfo::Type::STRING";
 			}
@@ -112,6 +114,7 @@
 			$this->m_pFieldArray = $pFieldArray;
 
 			$this->m_nDataSizeMap = array(
+				"Uint16" => 0,
 				"Uint32" => 0,
 				"String" => 0,
 				"Vector" => 0,
@@ -142,7 +145,8 @@
 			Output("\t{\n");
 				Output("\t\tpublic static " . $this->m_sName . "Info __pStatic = null;\n");
 				Output("\t\tpublic construct() : base(");
-					Output("" . $this->m_nDataSizeMap["Uint32"]);
+					Output("" . $this->m_nDataSizeMap["Uint16"]);
+					Output(", " . $this->m_nDataSizeMap["Uint32"]);
 					Output(", " . $this->m_nDataSizeMap["String"]);
 					Output(", " . $this->m_nDataSizeMap["Object"]);
 					Output(", " . $this->m_nDataSizeMap["Vector"]);
