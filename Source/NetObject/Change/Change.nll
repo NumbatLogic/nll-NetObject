@@ -12,6 +12,10 @@ namespace NumbatLogic
 				__nHash = nHash;
 			}
 
+			public destruct()
+			{
+			}
+
 			public virtual bool Apply(Object pObject)
 			{
 				if (__bApplied)
