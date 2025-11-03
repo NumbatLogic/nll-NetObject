@@ -89,6 +89,7 @@ namespace NumbatLogic
 				public TestChild GetMultiChildByName(string sName) { return cast TestChild(__GetVectorObjectByString(4, 0, 0, sName)); }
 			}
 
+		
 			class NetObjectStatic
 			{
 				public NetObject::ChangeMap* __pChangeMap;

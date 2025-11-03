@@ -252,6 +252,7 @@
 					}
 				}
 			Output("\t}\n");
+			Output("\n");
 		}
 	};
 
@@ -353,9 +354,6 @@
 	{
 		for ($i = 0; $i < sizeof($pObjectArray); $i++)
 		{
-			if ($i > 0)
-				Output("\n");
-
 			$pObject = $pObjectArray[$i];
 			$pObject->Output($pObjectArray);
 		}

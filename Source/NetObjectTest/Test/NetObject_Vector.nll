@@ -79,6 +79,7 @@ namespace NumbatLogic
 				public Child GetSpawnByName(string sName) { return cast Child(__GetVectorObjectByString(1, 0, 0, sName)); }
 			}
 
+		
 			class NetObjectStatic
 			{
 				public NetObject::ChangeMap* __pChangeMap;
