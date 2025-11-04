@@ -133,7 +133,7 @@ namespace NumbatLogic
 						case FieldInfo::Type::UINT16:
 						{
 							Uint16 n;
-							if (!pBlob.UnpackUint16(n))
+							if (!pBlob.UnpackUint16(ref n))
 								return false;
 							__pUint16Vector.Set(pInfo.__nDataIndex, n);
 							break;
@@ -141,7 +141,7 @@ namespace NumbatLogic
 						case FieldInfo::Type::UINT32:
 						{
 							Uint32 n;
-							if (!pBlob.UnpackUint32(n))
+							if (!pBlob.UnpackUint32(ref n))
 								return false;
 							__pUint32Vector.Set(pInfo.__nDataIndex, n);
 							break;
@@ -149,7 +149,7 @@ namespace NumbatLogic
 						case FieldInfo::Type::STRING:
 						{
 							Uint8 nFlag;
-							if (!pBlob.UnpackUint8(nFlag))
+							if (!pBlob.UnpackUint8(ref nFlag))
 								return false;
 							
 							InternalString sTemp = __pStringVector.Get(pInfo.__nDataIndex);
@@ -179,7 +179,7 @@ namespace NumbatLogic
 						case FieldInfo::Type::OBJECT:
 						{
 							Uint8 nFlag;
-							if (!pBlob.UnpackUint8(nFlag))
+							if (!pBlob.UnpackUint8(ref nFlag))
 								return false;
 							
 							Object pObject = __pObjectVector.Get(pInfo.__nDataIndex);
@@ -209,7 +209,7 @@ namespace NumbatLogic
 						case FieldInfo::Type::VECTOR:
 						{
 							Uint16 nSize;
-							if (!pBlob.UnpackUint16(nSize))
+							if (!pBlob.UnpackUint16(ref nSize))
 								return false;
 							
 							OwnedVector<Object> pVector = __pVectorVector.Get(pInfo.__nDataIndex);

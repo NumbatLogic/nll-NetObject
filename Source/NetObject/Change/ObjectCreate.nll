@@ -75,7 +75,7 @@ namespace NumbatLogic
 			{
 				if (!base.Unpack(pBlob))
 					return false;
-				if (!pBlob.UnpackUint8(__nFieldIndex))
+				if (!pBlob.UnpackUint8(ref __nFieldIndex))
 					return false;
 				return __pChangeset.Unpack(pBlob);
 			}

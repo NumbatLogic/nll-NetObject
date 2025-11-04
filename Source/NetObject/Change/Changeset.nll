@@ -38,12 +38,12 @@ namespace NumbatLogic
 				}
 			}
 
-			public override bool Unpack(gsBlob pBlob)
+			public bool Unpack(gsBlob pBlob)
 			{
 				Assert::Plz(__pChangeVector.GetSize() == 0);
 
 				Uint8 nCount;
-				if (!pBlob.UnpackUint8(nCount))
+				if (!pBlob.UnpackUint8(ref nCount))
 					return false;
 
 				for (int i = 0; i < nCount; i++)

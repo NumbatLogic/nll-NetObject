@@ -38,7 +38,7 @@ namespace NumbatLogic
 			public static Change** CreateAndUnpack(gsBlob pBlob)
 			{
 				Uint32 nHash;
-				if (!pBlob.UnpackUint32(nHash))
+				if (!pBlob.UnpackUint32(ref nHash))
 					return null;
 				
 				ChangeCreateCallbackInfo pCallbackInfo = ChangeMap::__Find(nHash);

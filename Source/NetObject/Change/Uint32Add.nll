@@ -34,7 +34,7 @@ namespace NumbatLogic
 			{
 				if (!base.Unpack(pBlob))
 					return false;
-				if (!pBlob.UnpackUint32(__nValue))
+				if (!pBlob.UnpackUint32(ref __nValue))
 					return false;
 				return true;
 			}
