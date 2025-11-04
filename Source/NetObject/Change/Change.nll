@@ -42,7 +42,7 @@ namespace NumbatLogic
 					return null;
 				
 				ChangeCreateCallbackInfo pCallbackInfo = ChangeMap::__Find(nHash);
-				if (!pCallbackInfo)
+				if (pCallbackInfo == null)
 					return null;
 
 				Change* pChange = own pCallbackInfo.__pCallback();

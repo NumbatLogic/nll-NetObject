@@ -18,6 +18,9 @@ namespace NumbatLogic
 
 			public bool Apply(Object pObject)
 			{
+				if (__pChangeVector.GetSize() > 255)
+					return false;
+
 				for (int i = 0; i < __pChangeVector.GetSize(); i++)
 				{
 					Change pChange = __pChangeVector.Get(i);
@@ -30,7 +33,9 @@ namespace NumbatLogic
 
 			public void Pack(gsBlob pBlob)
 			{
-				pBlob.PackUint8(__pChangeVector.GetSize());
+				Assert::Plz(__pChangeVector.GetSize() < 256);
+
+				pBlob.PackUint8(cast Uint8(__pChangeVector.GetSize()));
 				for (int i = 0; i < __pChangeVector.GetSize(); i++)
 				{
 					Change pChange = __pChangeVector.Get(i);

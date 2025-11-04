@@ -24,7 +24,7 @@ namespace NumbatLogic
 				if (__sFieldName != null)
 				{
 					FieldInfo pFieldInfo = pObject.__pInfo.GetFieldInfoByNameAndType(__sFieldName.GetExternalString(), __eType);
-					if (!pFieldInfo)
+					if (pFieldInfo == null)
 						return false;
 					__nFieldIndex = pFieldInfo.__nFieldIndex;
 					__nDataIndex = pFieldInfo.__nDataIndex;
