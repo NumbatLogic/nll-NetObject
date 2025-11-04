@@ -4,7 +4,7 @@ namespace NumbatLogic
 	{
 		class Uint32Add : ChangeField
 		{
-			public static const Uint32 HASH = ExternalString::GetChecksum("Uint32Add");
+			public static const Uint32 HASH = tthash("Uint32Add");
 			public static Change** __Create() { return new Uint32Add(); }
 			private construct() : base(HASH) {}
 

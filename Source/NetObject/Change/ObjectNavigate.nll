@@ -9,7 +9,7 @@ namespace NumbatLogic
 			public InternalString* __sFieldName;
 			public Changeset* __pChangeset;
 
-			public static const Uint32 HASH = ExternalString::GetChecksum("ObjectNavigate");
+			public static const Uint32 HASH = tthash("ObjectNavigate");
 			public static Change** __Create() { return new ObjectNavigate(); }
 			private construct() : base(HASH)
 			{

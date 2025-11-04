@@ -6,7 +6,7 @@ namespace NumbatLogic
 		{
 			public Changeset* __pChangeset;
 
-			public static const Uint32 HASH = ExternalString::GetChecksum("RootChange");
+			public static const Uint32 HASH = tthash("RootChange");
 			public static Change** __Create() { return new RootChange(); }
 			public construct() : base(HASH)
 			{
