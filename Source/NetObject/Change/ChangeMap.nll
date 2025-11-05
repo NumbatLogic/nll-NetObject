@@ -16,7 +16,7 @@ namespace NumbatLogic
 			}
 		}
 
-		class ChangeMap
+		class disposable ChangeMap
 		{
 			//public static int __nInitCount;
 			public static OwnedVector<ChangeCreateCallbackInfo>* __pCallbackInfoVector;

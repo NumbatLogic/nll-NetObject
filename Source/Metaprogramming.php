@@ -141,7 +141,7 @@
 				return;
 			}
 
-			Output("\tclass " . $this->m_sName . "Info : NetObject::ObjectInfo\n");
+			Output("\tclass disposable " . $this->m_sName . "Info : NetObject::ObjectInfo\n");
 			Output("\t{\n");
 				Output("\t\tpublic static " . $this->m_sName . "Info __pStatic = null;\n");
 				Output("\t\tpublic construct() : base(");
@@ -336,7 +336,7 @@
 						throw new Error("Unable to find type for sub field " . $pField->m_sType);
 
 					Output($sPadding . "{\n");
-						Output($sPadding . "\tFilter p" . $nDepth . " = " . $sPrefix . "__ExposeFieldCreateFilter(" . $nFieldIndex . ", 999);\n");
+						Output($sPadding . "\tNetObject::Filter p" . $nDepth . " = " . $sPrefix . "__ExposeFieldCreateFilter(" . $nFieldIndex . ", 999);\n");
 						$this->SubOutput($pFieldObject, $xValue, $pObjectArray, $nDepth+1, "p" . $nDepth . ".");
 					Output($sPadding . "}\n");
 				}
@@ -361,7 +361,7 @@
 		if ($bDoStatic)
 		{
 			Output("\n");
-			Output("\tclass NetObjectStatic\n");
+			Output("\tclass disposable NetObjectStatic\n");
 			Output("\t{\n");
 				Output("\t\tpublic NetObject::ChangeMap* __pChangeMap;\n");
 				for ($i = 0; $i < sizeof($pObjectArray); $i++)

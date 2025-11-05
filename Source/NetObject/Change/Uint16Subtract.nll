@@ -20,7 +20,7 @@ namespace NumbatLogic
 				if (!base.Apply(pObject))
 					return false;
 				
-				pObject.__pUint16Vector.Set(__nDataIndex, pObject.__pUint16Vector.Get(__nDataIndex) - __nValue);
+				pObject.__pUint16Vector.Set(__nDataIndex, cast Uint16(pObject.__pUint16Vector.Get(__nDataIndex) - __nValue));
 				return true;
 			}
 

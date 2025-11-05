@@ -28,7 +28,7 @@ namespace NumbatLogic
 
 			NetObject_Output($pOutputArray, true);
 		?>*/
-			class TestChildInfo : NetObject::ObjectInfo
+			class disposable TestChildInfo : NetObject::ObjectInfo
 			{
 				public static TestChildInfo __pStatic = null;
 				public construct() : base(0, 1, 1, 0, 0)
@@ -49,7 +49,7 @@ namespace NumbatLogic
 				public string GetName() { return __GetString(1, 0); }
 			}
 
-			class TestObjectInfo : NetObject::ObjectInfo
+			class disposable TestObjectInfo : NetObject::ObjectInfo
 			{
 				public static TestObjectInfo __pStatic = null;
 				public construct() : base(0, 2, 1, 1, 1)
@@ -90,7 +90,7 @@ namespace NumbatLogic
 			}
 
 		
-			class NetObjectStatic
+			class disposable NetObjectStatic
 			{
 				public NetObject::ChangeMap* __pChangeMap;
 				public TestChildInfo* __pTestChildInfo;

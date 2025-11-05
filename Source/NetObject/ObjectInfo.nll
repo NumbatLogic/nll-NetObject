@@ -35,7 +35,7 @@ namespace NumbatLogic
 			public FieldInfo GetFieldInfoByNameAndType(string sxName, FieldInfo::Type eType)
 			{
 				FieldInfo pFieldInfo = GetFieldInfoByName(sxName);
-				if (pFieldInfo && pFieldInfo.__eType == eType)
+				if (pFieldInfo != null && pFieldInfo.__eType == eType)
 					return pFieldInfo;
 				return null;
 			}

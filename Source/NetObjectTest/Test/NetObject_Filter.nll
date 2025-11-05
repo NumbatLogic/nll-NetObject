@@ -36,7 +36,7 @@ namespace NumbatLogic
 
 			NetObject_Output($pOutputArray, true);
 		?>*/
-			class ChildInfo : NetObject::ObjectInfo
+			class disposable ChildInfo : NetObject::ObjectInfo
 			{
 				public static ChildInfo __pStatic = null;
 				public construct() : base(0, 1, 1, 0, 0)
@@ -57,7 +57,7 @@ namespace NumbatLogic
 				public string GetName() { return __GetString(1, 0); }
 			}
 
-			class ParentInfo : NetObject::ObjectInfo
+			class disposable ParentInfo : NetObject::ObjectInfo
 			{
 				public static ParentInfo __pStatic = null;
 				public construct() : base(0, 2, 0, 1, 1)
@@ -104,7 +104,7 @@ namespace NumbatLogic
 					__ExposeField(0);
 					__ExposeField(1);
 					{
-						Filter p3 = __ExposeFieldCreateFilter(2, 999);
+						NetObject::Filter p3 = __ExposeFieldCreateFilter(2, 999);
 						p3.__ExposeField(0);
 					}
 				}
@@ -112,7 +112,7 @@ namespace NumbatLogic
 				public static ParentFilter GetStatic() { Assert::Plz(__pStatic != null); return __pStatic; }
 			}
 
-			class NetObjectStatic
+			class disposable NetObjectStatic
 			{
 				public NetObject::ChangeMap* __pChangeMap;
 				public ChildInfo* __pChildInfo;
@@ -133,8 +133,8 @@ namespace NumbatLogic
 			public static void Run()
 			{
 				NetObjectStatic* pStaticInfo = own new NetObjectStatic();
-
 				Parent* pObjectA = own new Parent(ParentFilter::GetStatic());
+				Assert::Plz(pObjectA != null);
 
 				// should fail
 				//pObjectA.GetSekrit();

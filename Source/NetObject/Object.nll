@@ -106,7 +106,7 @@ namespace NumbatLogic
 							}
 							else
 							{
-								pBlob.PackUint16(pVector.GetSize());
+								pBlob.PackUint16(cast Uint16(pVector.GetSize()));
 								for (int j = 0; j < pVector.GetSize(); j++)
 								{
 									Object pObject = pVector.Get(j);
@@ -118,6 +118,7 @@ namespace NumbatLogic
 						default:
 						{
 							Assert::Plz(false);
+							break;
 						}
 					}
 				}
@@ -241,6 +242,7 @@ namespace NumbatLogic
 						default:
 						{
 							Assert::Plz(false);
+							break;
 						}
 					}
 				}
