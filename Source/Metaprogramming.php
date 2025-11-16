@@ -6,9 +6,15 @@
 	{
 		switch ($sType)
 		{
-			case "Uint16": return "n";
-			case "Uint32": return "n";
-			case "string": return "s";
+			case "Int8":
+			case "Int16":
+			case "Int32":
+			case "Uint8":
+			case "Uint16":
+			case "Uint32":
+				return "n";
+			case "string":
+				return "s";
 		}
 		return "p";
 	}
@@ -42,7 +48,8 @@
 
 		function IsBasicType()
 		{
-			return $this->m_sType == "Uint16" || $this->m_sType == "Uint32";
+			return $this->m_sType == "Int8" || $this->m_sType == "Int16" || $this->m_sType == "Int32" ||
+					$this->m_sType == "Uint8" || $this->m_sType == "Uint16" || $this->m_sType == "Uint32";
 		}
 
 		function IsString()
@@ -77,6 +84,10 @@
 		{
 			switch ($this->m_sType)
 			{
+				case "Int8": return "NetObject::FieldInfo::Type::INT8";
+				case "Int16": return "NetObject::FieldInfo::Type::INT16";
+				case "Int32": return "NetObject::FieldInfo::Type::INT32";
+				case "Uint8": return "NetObject::FieldInfo::Type::UINT8";
 				case "Uint16": return "NetObject::FieldInfo::Type::UINT16";
 				case "Uint32": return "NetObject::FieldInfo::Type::UINT32";
 				case "string": return "NetObject::FieldInfo::Type::STRING";
@@ -114,6 +125,10 @@
 			$this->m_pFieldArray = $pFieldArray;
 
 			$this->m_nDataSizeMap = array(
+				"Int8" => 0,
+				"Int16" => 0,
+				"Int32" => 0,
+				"Uint8" => 0,
 				"Uint16" => 0,
 				"Uint32" => 0,
 				"String" => 0,
@@ -145,7 +160,11 @@
 			Output("\t{\n");
 				Output("\t\tpublic static " . $this->m_sName . "Info __pStatic = null;\n");
 				Output("\t\tpublic construct() : base(");
-					Output("" . $this->m_nDataSizeMap["Uint16"]);
+					Output("" . $this->m_nDataSizeMap["Int8"]);
+					Output(", " . $this->m_nDataSizeMap["Int16"]);
+					Output(", " . $this->m_nDataSizeMap["Int32"]);
+					Output(", " . $this->m_nDataSizeMap["Uint8"]);
+					Output(", " . $this->m_nDataSizeMap["Uint16"]);
 					Output(", " . $this->m_nDataSizeMap["Uint32"]);
 					Output(", " . $this->m_nDataSizeMap["String"]);
 					Output(", " . $this->m_nDataSizeMap["Object"]);

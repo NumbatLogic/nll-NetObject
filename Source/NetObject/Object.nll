@@ -8,6 +8,10 @@ namespace NumbatLogic
 			public Filter __pFilter;
 
 			// todo: NLL needs fixed array tech...
+			public Vector<Int8>* __pInt8Vector;
+			public Vector<Int16>* __pInt16Vector;
+			public Vector<Int32>* __pInt32Vector;
+			public Vector<Uint8>* __pUint8Vector;
 			public Vector<Uint16>* __pUint16Vector;
 			public Vector<Uint32>* __pUint32Vector;
 			public OwnedVector<InternalString>* __pStringVector;
@@ -18,6 +22,30 @@ namespace NumbatLogic
 			{
 				__pInfo = pInfo;
 				__pFilter = pFilter;
+				if (__pInfo.__nNumInt8 > 0)
+				{
+					__pInt8Vector = own new Vector<Int8>();
+					for (int i = 0; i < __pInfo.__nNumInt8; i++)
+						__pInt8Vector.PushBack(0);
+				}
+				if (__pInfo.__nNumInt16 > 0)
+				{
+					__pInt16Vector = own new Vector<Int16>();
+					for (int i = 0; i < __pInfo.__nNumInt16; i++)
+						__pInt16Vector.PushBack(0);
+				}
+				if (__pInfo.__nNumInt32 > 0)
+				{
+					__pInt32Vector = own new Vector<Int32>();
+					for (int i = 0; i < __pInfo.__nNumInt32; i++)
+						__pInt32Vector.PushBack(0);
+				}
+				if (__pInfo.__nNumUint8 > 0)
+				{
+					__pUint8Vector = own new Vector<Uint8>();
+					for (int i = 0; i < __pInfo.__nNumUint8; i++)
+						__pUint8Vector.PushBack(0);
+				}
 				if (__pInfo.__nNumUint16 > 0)
 				{
 					__pUint16Vector = own new Vector<Uint16>();
@@ -59,6 +87,26 @@ namespace NumbatLogic
 					FieldInfo pInfo = __pInfo.__pFieldInfoVector.Get(i);
 					switch (pInfo.__eType)
 					{
+						case FieldInfo::Type::INT8:
+						{
+							pBlob.PackInt8(__pInt8Vector.Get(pInfo.__nDataIndex));
+							break;
+						}
+						case FieldInfo::Type::INT16:
+						{
+							pBlob.PackInt16(__pInt16Vector.Get(pInfo.__nDataIndex));
+							break;
+						}
+						case FieldInfo::Type::INT32:
+						{
+							pBlob.PackInt32(__pInt32Vector.Get(pInfo.__nDataIndex));
+							break;
+						}
+						case FieldInfo::Type::UINT8:
+						{
+							pBlob.PackUint8(__pUint8Vector.Get(pInfo.__nDataIndex));
+							break;
+						}
 						case FieldInfo::Type::UINT16:
 						{
 							pBlob.PackUint16(__pUint16Vector.Get(pInfo.__nDataIndex));
@@ -131,6 +179,38 @@ namespace NumbatLogic
 					FieldInfo pInfo = __pInfo.__pFieldInfoVector.Get(i);
 					switch (pInfo.__eType)
 					{
+						case FieldInfo::Type::INT8:
+						{
+							Int8 n;
+							if (!pBlob.UnpackInt8(ref n))
+								return false;
+							__pInt8Vector.Set(pInfo.__nDataIndex, n);
+							break;
+						}
+						case FieldInfo::Type::INT16:
+						{
+							Int16 n;
+							if (!pBlob.UnpackInt16(ref n))
+								return false;
+							__pInt16Vector.Set(pInfo.__nDataIndex, n);
+							break;
+						}
+						case FieldInfo::Type::INT32:
+						{
+							Int32 n;
+							if (!pBlob.UnpackInt32(ref n))
+								return false;
+							__pInt32Vector.Set(pInfo.__nDataIndex, n);
+							break;
+						}
+						case FieldInfo::Type::UINT8:
+						{
+							Uint8 n;
+							if (!pBlob.UnpackUint8(ref n))
+								return false;
+							__pUint8Vector.Set(pInfo.__nDataIndex, n);
+							break;
+						}
 						case FieldInfo::Type::UINT16:
 						{
 							Uint16 n;
@@ -254,6 +334,22 @@ namespace NumbatLogic
 			{
 				Assert::Plz(__pInfo == pOther.__pInfo);
 
+				for (int i = 0; i < __pInfo.__nNumInt8; i++)
+					if (__pInt8Vector.Get(i) != pOther.__pInt8Vector.Get(i))
+						return false;
+						
+				for (int i = 0; i < __pInfo.__nNumInt16; i++)
+					if (__pInt16Vector.Get(i) != pOther.__pInt16Vector.Get(i))
+						return false;
+
+				for (int i = 0; i < __pInfo.__nNumInt32; i++)
+					if (__pInt32Vector.Get(i) != pOther.__pInt32Vector.Get(i))
+						return false;
+
+				for (int i = 0; i < __pInfo.__nNumUint8; i++)
+					if (__pUint8Vector.Get(i) != pOther.__pUint8Vector.Get(i))
+						return false;
+
 				for (int i = 0; i < __pInfo.__nNumUint16; i++)
 					if (__pUint16Vector.Get(i) != pOther.__pUint16Vector.Get(i))
 						return false;
@@ -332,6 +428,30 @@ namespace NumbatLogic
 			}
 
 			// todo: filter and range check!
+			public Int8 __GetInt8(Uint8 nFieldIndex, Uint8 nDataIndex)
+			{
+				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
+				return __pInt8Vector.Get(nDataIndex);
+			}
+
+			public Int16 __GetInt16(Uint8 nFieldIndex, Uint8 nDataIndex)
+			{
+				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
+				return __pInt16Vector.Get(nDataIndex);
+			}
+
+			public Int32 __GetInt32(Uint8 nFieldIndex, Uint8 nDataIndex)
+			{
+				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
+				return __pInt32Vector.Get(nDataIndex);
+			}
+
+			public Uint8 __GetUint8(Uint8 nFieldIndex, Uint8 nDataIndex)
+			{
+				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
+				return __pUint8Vector.Get(nDataIndex);
+			}
+
 			public Uint16 __GetUint16(Uint8 nFieldIndex, Uint8 nDataIndex)
 			{
 				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
@@ -388,6 +508,74 @@ namespace NumbatLogic
 				Assert::Plz(nVectorIndex <= pVector.GetSize());
 				
 				return pVector.Get(nVectorIndex);
+			}
+
+			public Object __GetVectorObjectByInt8(Uint8 nFieldIndex, Uint8 nDataIndex, int nVectorObjectDataIndex, Int8 nValue)
+			{
+				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
+				// todo: filter check (before vector check?)
+
+				if (pVector != null)
+				{
+					for (int i = 0; i < pVector.GetSize(); i++)
+					{
+						Object pVectorObject = pVector.Get(i);
+						if (pVectorObject.__pInt8Vector.Get(nVectorObjectDataIndex) == nValue)
+							return pVectorObject;
+					}
+				}
+				return null;
+			}
+
+			public Object __GetVectorObjectByInt16(Uint8 nFieldIndex, Uint8 nDataIndex, int nVectorObjectDataIndex, Int16 nValue)
+			{
+				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
+				// todo: filter check (before vector check?)
+
+				if (pVector != null)
+				{
+					for (int i = 0; i < pVector.GetSize(); i++)
+					{
+						Object pVectorObject = pVector.Get(i);
+						if (pVectorObject.__pInt16Vector.Get(nVectorObjectDataIndex) == nValue)
+							return pVectorObject;
+					}
+				}
+				return null;
+			}
+
+			public Object __GetVectorObjectByInt32(Uint8 nFieldIndex, Uint8 nDataIndex, int nVectorObjectDataIndex, Int32 nValue)
+			{
+				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
+				// todo: filter check (before vector check?)
+
+				if (pVector != null)
+				{
+					for (int i = 0; i < pVector.GetSize(); i++)
+					{
+						Object pVectorObject = pVector.Get(i);
+						if (pVectorObject.__pInt32Vector.Get(nVectorObjectDataIndex) == nValue)
+							return pVectorObject;
+					}
+				}
+				return null;
+			}
+
+			public Object __GetVectorObjectByUint8(Uint8 nFieldIndex, Uint8 nDataIndex, int nVectorObjectDataIndex, Uint8 nValue)
+			{
+				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
+				// todo: filter check (before vector check?)
+
+				if (pVector != null)
+				{
+					for (int i = 0; i < pVector.GetSize(); i++)
+					{
+						Object pVectorObject = pVector.Get(i);
+						if (pVectorObject.__pUint8Vector.Get(nVectorObjectDataIndex) == nValue)
+							return pVectorObject;
+					}
+				}
+				return null;
 			}
 
 			public Object __GetVectorObjectByUint16(Uint8 nFieldIndex, Uint8 nDataIndex, int nVectorObjectDataIndex, Uint16 nValue)

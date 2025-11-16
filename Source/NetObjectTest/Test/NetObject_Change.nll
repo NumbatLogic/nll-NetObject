@@ -31,7 +31,7 @@ namespace NumbatLogic
 			class disposable TestChildInfo : NetObject::ObjectInfo
 			{
 				public static TestChildInfo __pStatic = null;
-				public construct() : base(0, 1, 1, 0, 0)
+				public construct() : base(0, 0, 0, 0, 0, 1, 1, 0, 0)
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;
@@ -52,7 +52,7 @@ namespace NumbatLogic
 			class disposable TestObjectInfo : NetObject::ObjectInfo
 			{
 				public static TestObjectInfo __pStatic = null;
-				public construct() : base(0, 2, 1, 1, 1)
+				public construct() : base(0, 0, 0, 0, 0, 2, 1, 1, 1)
 				{
 					Assert::Plz(__pStatic == null);
 					__pStatic = this;

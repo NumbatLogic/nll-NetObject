@@ -5,6 +5,10 @@ namespace NumbatLogic
 		class FieldInfo
 		{
 			public enum Type {
+				INT8,
+				INT16,
+				INT32,
+				UINT8,
 				UINT16,
 				UINT32,
 				STRING,
