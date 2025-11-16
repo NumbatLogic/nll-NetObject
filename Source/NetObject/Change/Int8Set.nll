@@ -1,0 +1,43 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class Int8Set : ChangeField
+		{
+			public static const Uint32 HASH = tthash("Int8Set");
+			public static Change** __Create() { return new Int8Set(); }
+			private construct() : base(HASH) {}
+
+			public Int8 __nValue;
+
+			public construct(string sxFieldName, Int8 nValue) : base(HASH, FieldInfo::Type::INT8, sxFieldName)
+			{
+				__nValue = nValue;
+			}
+
+			public override bool Apply(Object pObject)
+			{
+				if (!base.Apply(pObject))
+					return false;
+				
+				pObject.__pInt8Vector.Set(__nDataIndex, __nValue);
+				return true;
+			}
+
+			public override void Pack(gsBlob pBlob)
+			{
+				base.Pack(pBlob);
+				pBlob.PackInt8(__nValue);
+			}
+
+			public override bool Unpack(gsBlob pBlob)
+			{
+				if (!base.Unpack(pBlob))
+					return false;
+				if (!pBlob.UnpackInt8(ref __nValue))
+					return false;
+				return true;
+			}
+		}
+	}
+}

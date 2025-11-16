@@ -1,0 +1,43 @@
+namespace NumbatLogic
+{
+	namespace NetObject
+	{
+		class Uint8Add : ChangeField
+		{
+			public static const Uint32 HASH = tthash("Uint8Add");
+			public static Change** __Create() { return new Uint8Add(); }
+			private construct() : base(HASH) {}
+
+			public Uint8 __nValue;
+
+			public construct(string sxFieldName, Uint8 nValue) : base(HASH, FieldInfo::Type::UINT8, sxFieldName)
+			{
+				__nValue = nValue;
+			}
+
+			public override bool Apply(Object pObject)
+			{
+				if (!base.Apply(pObject))
+					return false;
+				
+				pObject.__pUint8Vector.Set(__nDataIndex, cast Uint8(pObject.__pUint8Vector.Get(__nDataIndex) + __nValue));
+				return true;
+			}
+
+			public override void Pack(gsBlob pBlob)
+			{
+				base.Pack(pBlob);
+				pBlob.PackUint8(__nValue);
+			}
+
+			public override bool Unpack(gsBlob pBlob)
+			{
+				if (!base.Unpack(pBlob))
+					return false;
+				if (!pBlob.UnpackUint8(ref __nValue))
+					return false;
+				return true;
+			}
+		}
+	}
+}

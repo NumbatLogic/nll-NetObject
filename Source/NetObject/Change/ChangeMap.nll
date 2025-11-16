@@ -30,6 +30,12 @@ namespace NumbatLogic
 				Register(ObjectNavigate::HASH, ObjectNavigate::__Create);
 				Register(RootChange::HASH, RootChange::__Create);
 				Register(StringSet::HASH, StringSet::__Create);
+				Register(Int8Set::HASH, Int8Set::__Create);
+				Register(Int16Set::HASH, Int16Set::__Create);
+				Register(Int32Set::HASH, Int32Set::__Create);
+				Register(Uint8Add::HASH, Uint8Add::__Create);
+				Register(Uint8Set::HASH, Uint8Set::__Create);
+				Register(Uint8Subtract::HASH, Uint8Subtract::__Create);
 				Register(Uint16Add::HASH, Uint16Add::__Create);
 				Register(Uint16Set::HASH, Uint16Set::__Create);
 				Register(Uint16Subtract::HASH, Uint16Subtract::__Create);
