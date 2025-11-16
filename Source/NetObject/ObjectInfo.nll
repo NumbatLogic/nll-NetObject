@@ -10,12 +10,13 @@ namespace NumbatLogic
 			public int __nNumUint8;
 			public int __nNumUint16;
 			public int __nNumUint32;
+			public int __nNumFloat;
 			public int __nNumString;
 			public int __nNumObject;
 			public int __nNumVector;
 			public OwnedVector<FieldInfo>* __pFieldInfoVector;
 
-			public construct(int nNumInt8, int nNumInt16, int nNumInt32, int nNumUint8, int nNumUint16, int nNumUint32, int nNumString, int nNumObject, int nNumVector)
+			public construct(int nNumInt8, int nNumInt16, int nNumInt32, int nNumUint8, int nNumUint16, int nNumUint32, int nNumFloat, int nNumString, int nNumObject, int nNumVector)
 			{
 				__nNumInt8 = nNumInt8;
 				__nNumInt16 = nNumInt16;
@@ -23,6 +24,7 @@ namespace NumbatLogic
 				__nNumUint8 = nNumUint8;
 				__nNumUint16 = nNumUint16;
 				__nNumUint32 = nNumUint32;
+				__nNumFloat = nNumFloat;
 				__nNumString = nNumString;
 				__nNumObject = nNumObject;
 				__nNumVector = nNumVector;

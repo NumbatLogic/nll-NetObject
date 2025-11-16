@@ -13,6 +13,8 @@
 			case "Uint16":
 			case "Uint32":
 				return "n";
+			case "float":
+				return "f";
 			case "string":
 				return "s";
 		}
@@ -49,7 +51,8 @@
 		function IsBasicType()
 		{
 			return $this->m_sType == "Int8" || $this->m_sType == "Int16" || $this->m_sType == "Int32" ||
-					$this->m_sType == "Uint8" || $this->m_sType == "Uint16" || $this->m_sType == "Uint32";
+					$this->m_sType == "Uint8" || $this->m_sType == "Uint16" || $this->m_sType == "Uint32" ||
+					$this->m_sType == "float";
 		}
 
 		function IsString()
@@ -71,6 +74,8 @@
 
 		function GetDataType()
 		{
+			if ($this->m_sType == "float")
+				return "Float";
 			if ($this->IsBasicType())
 				return $this->m_sType;
 			if ($this->IsString())
@@ -90,6 +95,7 @@
 				case "Uint8": return "NetObject::FieldInfo::Type::UINT8";
 				case "Uint16": return "NetObject::FieldInfo::Type::UINT16";
 				case "Uint32": return "NetObject::FieldInfo::Type::UINT32";
+				case "float": return "NetObject::FieldInfo::Type::FLOAT";
 				case "string": return "NetObject::FieldInfo::Type::STRING";
 			}
 			if ($this->m_bVector)
@@ -131,6 +137,7 @@
 				"Uint8" => 0,
 				"Uint16" => 0,
 				"Uint32" => 0,
+				"Float" => 0,
 				"String" => 0,
 				"Vector" => 0,
 				"Object" => 0);
@@ -166,6 +173,7 @@
 					Output(", " . $this->m_nDataSizeMap["Uint8"]);
 					Output(", " . $this->m_nDataSizeMap["Uint16"]);
 					Output(", " . $this->m_nDataSizeMap["Uint32"]);
+					Output(", " . $this->m_nDataSizeMap["Float"]);
 					Output(", " . $this->m_nDataSizeMap["String"]);
 					Output(", " . $this->m_nDataSizeMap["Object"]);
 					Output(", " . $this->m_nDataSizeMap["Vector"]);

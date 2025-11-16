@@ -11,6 +11,7 @@ namespace NumbatLogic
 				UINT8,
 				UINT16,
 				UINT32,
+				FLOAT,
 				STRING,
 				OBJECT,
 				VECTOR

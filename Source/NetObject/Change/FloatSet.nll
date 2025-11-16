@@ -2,15 +2,15 @@ namespace NumbatLogic
 {
 	namespace NetObject
 	{
-		class Int32Set : ChangeField
+		class FloatSet : ChangeField
 		{
-			public static const Uint32 HASH = tthash("Int32Set");
-			public static Change** __Create() { return new Int32Set(); }
+			public static const Uint32 HASH = tthash("FloatSet");
+			public static Change** __Create() { return new FloatSet(); }
 			private construct() : base(HASH) {}
 
-			public Int32 __nValue;
+			public float __nValue;
 
-			public construct(string sxFieldName, Int32 nValue) : base(HASH, FieldInfo::Type::INT32, sxFieldName)
+			public construct(string sxFieldName, float nValue) : base(HASH, FieldInfo::Type::FLOAT, sxFieldName)
 			{
 				__nValue = nValue;
 			}
@@ -20,21 +20,21 @@ namespace NumbatLogic
 				if (!base.Apply(pObject))
 					return false;
 				
-				pObject.__pInt32Vector.Set(__nDataIndex, __nValue);
+				pObject.__pFloatVector.Set(__nDataIndex, __nValue);
 				return true;
 			}
 
 			public override void Pack(gsBlob pBlob)
 			{
 				base.Pack(pBlob);
-				pBlob.PackInt32(__nValue);
+				pBlob.PackFloat(__nValue);
 			}
 
 			public override bool Unpack(gsBlob pBlob)
 			{
 				if (!base.Unpack(pBlob))
 					return false;
-				if (!pBlob.UnpackInt32(ref __nValue))
+				if (!pBlob.UnpackFloat(ref __nValue))
 					return false;
 				return true;
 			}
