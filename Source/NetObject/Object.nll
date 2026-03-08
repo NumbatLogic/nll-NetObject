@@ -17,7 +17,7 @@ namespace NumbatLogic
 			public Vector<float>* __pFloatVector;
 			public OwnedVector<InternalString>* __pStringVector;
 			public OwnedVector<Object>* __pObjectVector;
-			public OwnedVector<OwnedVector<Object>!>* __pVectorVector;
+			public OwnedVector<OwnedVector<Object>>* __pVectorVector;
 
 			public construct(ObjectInfo pInfo, Filter pFilter)
 			{
@@ -79,7 +79,7 @@ namespace NumbatLogic
 				}
 				if (__pInfo.__nNumVector > 0)
 				{
-					__pVectorVector = own new OwnedVector<OwnedVector<Object>!>();
+					__pVectorVector = own new OwnedVector<OwnedVector<Object>>();
 					for (int i = 0; i < __pInfo.__nNumVector; i++)
 						__pVectorVector.PushBack(null);
 				}
