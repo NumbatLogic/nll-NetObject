@@ -4,12 +4,7 @@
 		public function __construct($sAction)
 		{
 			parent::__construct($sAction);
-			$this->m_xFileArray = ProjectGen_ParseDirectory(dirname(__FILE__), "/\.h$|\.c$|\.hpp$|\.cpp$/");
-
-			$this->m_xFileArray = array_merge(
-				ProjectGen_ParseDirectory(dirname(__FILE__), "/\.h$|\.c$|\.hpp$|\.cpp$/"),
-				//ProjectGen_ParseDirectory(dirname(__FILE__) . "/../../Transpiled", "/\.hpp$|\.cpp$/")
-			);
+			$this->m_xFileArray = ProjectGen_ParseDirectory(dirname(__FILE__) . "/../../Transpiled/NetObject", "/\.h$|\.c$|\.hpp$|\.cpp$/");
 		}
 
 		public function GetName() { return "NetObject"; }
@@ -24,13 +19,6 @@
 			//	"../Package",
 			//	"../Engine",
 			);
-
-			/*if ($this->m_sPlatform == PLATFORM_WINDOWS)
-			{
-				$sArray[] = "../../../Library/Windows/GLEW/include";
-				$sArray[] = "../../../Library/Windows/GLFW/include";
-				$sArray[] = "../../../Library/Windows/libcurl/include";
-			}*/
 
 			return $sArray;
 		}
