@@ -1,0 +1,53 @@
+namespace NumbatLogic
+{
+	class NetObjectTest
+	{
+		public static void @EntryPoint() Run(Vector<string> sArgVector)
+		{
+			Console::Log("NetObject Test");
+
+			/*<?
+				include_once "../../../LangShared/Source/Test/TestMetaprogramming.php";
+				Test_SetFolder("Test");
+				Test_Output(true);
+			?>*/
+				if (sArgVector.GetSize() == 0 || ExternalString::Equal(sArgVector.Get(0), "NetObject_BlobPack"))
+				{
+					Console::Log("NetObject_BlobPack");
+					NetObject_BlobPack::Test::Run();
+				}
+				if (sArgVector.GetSize() == 0 || ExternalString::Equal(sArgVector.Get(0), "NetObject_Change"))
+				{
+					Console::Log("NetObject_Change");
+					NetObject_Change::Test::Run();
+				}
+				if (sArgVector.GetSize() == 0 || ExternalString::Equal(sArgVector.Get(0), "NetObject_ChangeMultiple"))
+				{
+					Console::Log("NetObject_ChangeMultiple");
+					NetObject_ChangeMultiple::Test::Run();
+				}
+				if (sArgVector.GetSize() == 0 || ExternalString::Equal(sArgVector.Get(0), "NetObject_ChangeString"))
+				{
+					Console::Log("NetObject_ChangeString");
+					NetObject_ChangeString::Test::Run();
+				}
+				if (sArgVector.GetSize() == 0 || ExternalString::Equal(sArgVector.Get(0), "NetObject_ChangeUint32"))
+				{
+					Console::Log("NetObject_ChangeUint32");
+					NetObject_ChangeUint32::Test::Run();
+				}
+				if (sArgVector.GetSize() == 0 || ExternalString::Equal(sArgVector.Get(0), "NetObject_Filter"))
+				{
+					Console::Log("NetObject_Filter");
+					NetObject_Filter::Test::Run();
+				}
+				if (sArgVector.GetSize() == 0 || ExternalString::Equal(sArgVector.Get(0), "NetObject_Vector"))
+				{
+					Console::Log("NetObject_Vector");
+					NetObject_Vector::Test::Run();
+				}
+
+			/*<??>*/
+		}
+	}
+}
