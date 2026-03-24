@@ -21,7 +21,6 @@
 				"NetObject",
 				"LangShared"
 			);
-
 			return $sArray;
 		}
 	}
