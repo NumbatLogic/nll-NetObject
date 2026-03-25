@@ -6,8 +6,8 @@
 			parent::__construct($sAction);
 
 			$this->m_xFileArray = array_merge(
-				ProjectGen_ParseDirectory(dirname(__FILE__), "/\.hpp|\.cpp/"),
-				ProjectGen_ParseDirectory(dirname(__FILE__) . "/../../Transpiled/NetObjectTest", "/\.hpp|\.cpp/"),
+				ProjectGen_ParseDirectory(dirname(__FILE__), ProjectGen_GetSourceRegex($sAction)),
+				ProjectGen_ParseDirectory(dirname(__FILE__) . "/../../Transpiled/NetObjectTest", ProjectGen_GetSourceRegex($sAction))
 			);
 		}
 
