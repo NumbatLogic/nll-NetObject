@@ -27,13 +27,8 @@ pipeline{
 						branch: "main",
 						credentialsId: 'c532651f-f9a2-48a8-8a37-8df46a9c5ee2'
 				}
-				dir("nll-PgSql"){
-					git url: "https://github.com/NumbatLogic/nll-PgSql",
-						branch: "main",
-						credentialsId: 'c532651f-f9a2-48a8-8a37-8df46a9c5ee2'
-				}
-				dir("gsMigrator"){
-					git url: "https://github.com/NumbatLogic/gsMigrator",
+				dir("nll-NetObject"){
+					git url: "https://github.com/NumbatLogic/nll-NetObject",
 						branch: "main",
 						credentialsId: 'c532651f-f9a2-48a8-8a37-8df46a9c5ee2'
 				}
@@ -42,7 +37,7 @@ pipeline{
 
 		stage("Build"){
 			steps{
-				sh "cd gsMigrator && ./CIRebuild.sh"
+				sh "cd nll-NetObject && ./CIRebuild.sh"
 			}
 		}
 
