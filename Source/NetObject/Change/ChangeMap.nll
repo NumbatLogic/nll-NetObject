@@ -33,6 +33,7 @@ namespace NumbatLogic
 				Register(Int8Set::HASH, Int8Set::__Create);
 				Register(Int16Set::HASH, Int16Set::__Create);
 				Register(Int32Set::HASH, Int32Set::__Create);
+				Register(Int64Set::HASH, Int64Set::__Create);
 				Register(Uint8Add::HASH, Uint8Add::__Create);
 				Register(Uint8Set::HASH, Uint8Set::__Create);
 				Register(Uint8Subtract::HASH, Uint8Subtract::__Create);

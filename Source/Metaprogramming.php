@@ -9,6 +9,7 @@
 			case "Int8":
 			case "Int16":
 			case "Int32":
+			case "Int64":
 			case "Uint8":
 			case "Uint16":
 			case "Uint32":
@@ -50,7 +51,7 @@
 
 		function IsBasicType()
 		{
-			return $this->m_sType == "Int8" || $this->m_sType == "Int16" || $this->m_sType == "Int32" ||
+			return $this->m_sType == "Int8" || $this->m_sType == "Int16" || $this->m_sType == "Int32" || $this->m_sType == "Int64" ||
 					$this->m_sType == "Uint8" || $this->m_sType == "Uint16" || $this->m_sType == "Uint32" ||
 					$this->m_sType == "float";
 		}
@@ -92,6 +93,7 @@
 				case "Int8": return "NetObject::FieldInfo::Type::INT8";
 				case "Int16": return "NetObject::FieldInfo::Type::INT16";
 				case "Int32": return "NetObject::FieldInfo::Type::INT32";
+				case "Int64": return "NetObject::FieldInfo::Type::INT64";
 				case "Uint8": return "NetObject::FieldInfo::Type::UINT8";
 				case "Uint16": return "NetObject::FieldInfo::Type::UINT16";
 				case "Uint32": return "NetObject::FieldInfo::Type::UINT32";
@@ -134,6 +136,7 @@
 				"Int8" => 0,
 				"Int16" => 0,
 				"Int32" => 0,
+				"Int64" => 0,
 				"Uint8" => 0,
 				"Uint16" => 0,
 				"Uint32" => 0,
@@ -170,6 +173,7 @@
 					Output("" . $this->m_nDataSizeMap["Int8"]);
 					Output(", " . $this->m_nDataSizeMap["Int16"]);
 					Output(", " . $this->m_nDataSizeMap["Int32"]);
+					Output(", " . $this->m_nDataSizeMap["Int64"]);
 					Output(", " . $this->m_nDataSizeMap["Uint8"]);
 					Output(", " . $this->m_nDataSizeMap["Uint16"]);
 					Output(", " . $this->m_nDataSizeMap["Uint32"]);

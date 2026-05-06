@@ -11,6 +11,7 @@ namespace NumbatLogic
 			public Vector<Int8>* __pInt8Vector;
 			public Vector<Int16>* __pInt16Vector;
 			public Vector<Int32>* __pInt32Vector;
+			public Vector<Int64>* __pInt64Vector;
 			public Vector<Uint8>* __pUint8Vector;
 			public Vector<Uint16>* __pUint16Vector;
 			public Vector<Uint32>* __pUint32Vector;
@@ -40,6 +41,12 @@ namespace NumbatLogic
 					__pInt32Vector = own new Vector<Int32>();
 					for (int i = 0; i < __pInfo.__nNumInt32; i++)
 						__pInt32Vector.PushBack(0);
+				}
+				if (__pInfo.__nNumInt64 > 0)
+				{
+					__pInt64Vector = own new Vector<Int64>();
+					for (int i = 0; i < __pInfo.__nNumInt64; i++)
+						__pInt64Vector.PushBack(0);
 				}
 				if (__pInfo.__nNumUint8 > 0)
 				{
@@ -107,6 +114,11 @@ namespace NumbatLogic
 						case FieldInfo::Type::INT32:
 						{
 							pBlob.PackInt32(__pInt32Vector.Get(pInfo.__nDataIndex));
+							break;
+						}
+						case FieldInfo::Type::INT64:
+						{
+							pBlob.PackInt64(__pInt64Vector.Get(pInfo.__nDataIndex));
 							break;
 						}
 						case FieldInfo::Type::UINT8:
@@ -213,6 +225,14 @@ namespace NumbatLogic
 							if (!pBlob.UnpackInt32(ref n))
 								return false;
 							__pInt32Vector.Set(pInfo.__nDataIndex, n);
+							break;
+						}
+						case FieldInfo::Type::INT64:
+						{
+							Int64 n;
+							if (!pBlob.UnpackInt64(ref n))
+								return false;
+							__pInt64Vector.Set(pInfo.__nDataIndex, n);
 							break;
 						}
 						case FieldInfo::Type::UINT8:
@@ -366,6 +386,10 @@ namespace NumbatLogic
 					if (__pInt32Vector.Get(i) != pOther.__pInt32Vector.Get(i))
 						return false;
 
+				for (int i = 0; i < __pInfo.__nNumInt64; i++)
+					if (__pInt64Vector.Get(i) != pOther.__pInt64Vector.Get(i))
+						return false;
+
 				for (int i = 0; i < __pInfo.__nNumUint8; i++)
 					if (__pUint8Vector.Get(i) != pOther.__pUint8Vector.Get(i))
 						return false;
@@ -468,6 +492,12 @@ namespace NumbatLogic
 			{
 				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
 				return __pInt32Vector.Get(nDataIndex);
+			}
+
+			public Int64 __GetInt64(Uint8 nFieldIndex, Uint8 nDataIndex)
+			{
+				Assert::Plz(__pFilter == null || __pFilter.__bExposeFieldVector.Get(nFieldIndex));
+				return __pInt64Vector.Get(nDataIndex);
 			}
 
 			public Uint8 __GetUint8(Uint8 nFieldIndex, Uint8 nDataIndex)
@@ -585,6 +615,23 @@ namespace NumbatLogic
 					{
 						Object pVectorObject = pVector.Get(i);
 						if (pVectorObject.__pInt32Vector.Get(nVectorObjectDataIndex) == nValue)
+							return pVectorObject;
+					}
+				}
+				return null;
+			}
+
+			public Object __GetVectorObjectByInt64(Uint8 nFieldIndex, Uint8 nDataIndex, int nVectorObjectDataIndex, Int64 nValue)
+			{
+				OwnedVector<Object> pVector = __pVectorVector.Get(nDataIndex);
+				// todo: filter check (before vector check?)
+
+				if (pVector != null)
+				{
+					for (int i = 0; i < pVector.GetSize(); i++)
+					{
+						Object pVectorObject = pVector.Get(i);
+						if (pVectorObject.__pInt64Vector.Get(nVectorObjectDataIndex) == nValue)
 							return pVectorObject;
 					}
 				}
